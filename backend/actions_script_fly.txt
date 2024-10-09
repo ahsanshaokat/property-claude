@@ -1,0 +1,15 @@
+name: Fly Deploy from github actions
+on:
+  push:
+    branches:
+      - main
+env:
+  FLY_API_TOKEN: ${{ secrets.FLY_TOKEN_PROPERTY }}
+jobs:
+  deploy:
+      name: Deploy app
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v3
+        - uses: superfly/flyctl-actions/setup-flyctl@master
+        - run: flyctl deploy --build-arg NODE_ENV=production --remote-only

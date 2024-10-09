@@ -20,6 +20,7 @@
     "lodash": "^4.17.21",
     "next": "12.3.0",
     "next-auth": "^4.13.0",
+    "property-finder-fe": "file:",
     "qs": "^6.11.0",
     "react": "18.2.0",
     "react-bootstrap": "^2.5.0",

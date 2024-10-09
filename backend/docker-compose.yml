@@ -1,0 +1,40 @@
+version: '3.7'
+
+services:
+
+  property_me_be:
+    build:
+      context: .
+      dockerfile: ./Local_Dockerfile
+    command: npm run dev
+    container_name: property_finder
+    volumes:
+      - ./:/home/node
+      - /home/node/node_modules
+    ports:
+      - '8080:7890'
+    depends_on:
+      - property_db
+    env_file:
+      - .env
+    environment:
+      - TZ=Asia/Dhaka
+      - DATABASE_URL=mysql://root:12345678@property_db_container:3306/property_me
+      - DB_DRIVER=mysql
+      - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME}
+      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
+      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
+      - CORS_ALLOWED_HOSTS=${CORS_ALLOWED_HOSTS}
+
+  # mysql -h 0.0.0.0 -P 3390 -u root -D property_me -p'12345678' // to connect mysql from terminal
+  property_db:
+    # platform: linux/x86_64 // for mac m1 build
+    image: mysql:5.7
+    restart: always
+    environment:
+      TZ: Asia/Dhaka
+      MYSQL_DATABASE: property_me
+      MYSQL_ROOT_PASSWORD: 12345678
+    container_name: property_db_container
+    ports:
+      - '3390:3306'

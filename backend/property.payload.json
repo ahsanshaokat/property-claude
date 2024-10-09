@@ -1,0 +1,46 @@
+{
+    "name":"Mesa Verde",
+    "purpose":"RENT",
+    "descriptions":"Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Claritas est etiam processus dynamicus, qui sequitur mutationem consuetudium lectorum. Mirum est notare quam littera gothica, quam nunc putamus parum claram, anteposuerit litterarum formas. Feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent.Feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum.",
+    "address":"6335 Annie Oakley Drive, Las Vegas, NV 89120",
+    "price":3500.00,
+    "noOfBedRoom":3,
+    "noOfBathRoom":1,
+    "propertySize":660,
+    "yearBuild":2001,
+    "totalFloors":5,
+    "accommodations":"WITHOUT_FURNITURE",
+    "ceilingHeight":2.4,
+    "distanceFromCenter":20,
+    "parking":"FREE_ZONE",
+    "areaSize":660,
+    "garage":0,
+    "additionalSpec":"STORAGE_SPACE",
+    "utilityCost":100.00,
+    "cableTvCost":100.00,
+    "electricityCost":"AFTER_SPENDING",
+    "lat":37.788099,
+    "long":-122.440293,
+    "propertyType":1,
+    "city":1,
+    "features":[1,2,3],
+    "propertyImages":[1,2,3],
+    "floorPlans":[
+        {
+            "name":"GROUND FLOOR",
+            "description":"Feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum.",
+            "floorNo":0,
+            "noOfBathRoom":1,
+            "propertySize":600,
+            "noOfBedRoom":3,
+            "floorPlanImages":[4]
+        }
+    ],
+    "rentCriteria":{
+        "deposit":500.00,
+        "petAllowed":1,
+        "paymentPeriod":"MONTHLY",
+        "habitable":"INSTANTLY",
+        "minimumStayDuration":60
+    }
+}
