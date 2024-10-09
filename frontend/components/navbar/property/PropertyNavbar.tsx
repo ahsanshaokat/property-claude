@@ -28,7 +28,7 @@ const PropertyNavbar = () => {
           className={`${styles.ft18} ${styles.ftBold}`}
         >
           <span className="text-white">property</span>
-          <span className="text-warning">.finder</span>
+          <span className="text-warning">.sonnet</span>
         </Navbar.Brand>
 
         {/* <Navbar.Brand href="#home">React-Bootstrap</Navbar.Brand> */}

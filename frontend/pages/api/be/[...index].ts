@@ -30,6 +30,7 @@ const proxyToBackend = async (req: NextApiRequest, res: NextApiResponse) => {
       });
       res.status(apiRes.status).json(apiRes.data);
     } catch (error) {
+      console.log('=error==', error)
       if (error instanceof AxiosError) {
         res.status(400).json({
           ...error?.response?.data,

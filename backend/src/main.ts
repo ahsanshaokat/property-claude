@@ -16,8 +16,8 @@ async function bootstrap() {
   });
 
   const config = new DocumentBuilder()
-    .setTitle('Property Nokar Backend')
-    .setDescription('Property Nokar API description')
+    .setTitle('Property Sonnet Backend')
+    .setDescription('Property Sonnet API description')
     .setVersion('1.0')
     .addTag('property_finder')
     .addBearerAuth()

@@ -12,7 +12,7 @@ const AdminNavbar = () => {
         <Container className="px-4" fluid>
           <Navbar.Brand href="/admin/home">
             <span className="text-white">property</span>
-            <span className="text-warning">.finder</span>
+            <span className="text-warning">.sonnet</span>
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="navbarScroll" />
           <Navbar.Collapse id="navbarScroll">
