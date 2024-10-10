@@ -13,6 +13,8 @@ import SubmitButton from "@/components/common/form/SubmitButton";
 const SignUp = () => {
   const router = useRouter();
   const [submitLoading, setSubmitLoading] = useState(false);
+
+  // Hook form with yup validation
   const {
     register,
     handleSubmit,
@@ -22,29 +24,38 @@ const SignUp = () => {
     mode: "onTouched",
   });
 
+  // Error message function
   const errorMessage = getErrorMessage(errors);
 
+  // OnSubmit function handling form submission
   const onSubmit = async (data: SignUpFormFields) => {
-    const singUpPayload = {
+    // Generate a temporary email from the username
+    const tempEmail = `${data.username}@tempmail.com`; // Adjust domain if needed
+
+    const signUpPayload = {
       ...data,
-      
+      email: tempEmail, // Set the hidden email from username
     };
+
     try {
       setSubmitLoading(true);
-      const createUser = await signUp(singUpPayload);
+      const createUser = await signUp(signUpPayload); // Call API
+
       if (createUser.data) {
-        router.push("/auth/signin");
+        router.push("/auth/signin"); // Redirect after successful signup
       } else {
         setSubmitLoading(false);
-        alert("Username password error");
+        alert("Username or password error");
       }
     } catch (error: any) {
       setSubmitLoading(false);
+
       if (error instanceof AxiosError) {
         const message = error.response?.data?.message as string;
         const findDuplicateError = message.search("usersUniqueName");
+
         if (findDuplicateError) {
-          alert("Username already exists !");
+          alert("Username already exists!");
         } else {
           alert(message);
         }
@@ -63,6 +74,8 @@ const SignUp = () => {
                   <h3 className="text-center ft-24 fw-bold">Create account</h3>
                 </Col>
               </Row>
+
+              {/* Form submission */}
               <Form onSubmit={handleSubmit(onSubmit)}>
                 <Row className="mb-3">
                   <Form.Group as={Col} controlId="firstName">
@@ -75,6 +88,7 @@ const SignUp = () => {
                     )}
                   </Form.Group>
                 </Row>
+
                 <Row className="mb-3">
                   <Form.Group as={Col} controlId="lastName">
                     <Form.Label>Last Name</Form.Label>
@@ -86,9 +100,10 @@ const SignUp = () => {
                     )}
                   </Form.Group>
                 </Row>
+
                 <Row className="mb-3">
                   <Form.Group as={Col} controlId="username">
-                    <Form.Label>User name</Form.Label>
+                    <Form.Label>Username</Form.Label>
                     <Form.Control type="text" {...register("username")} />
                     {errorMessage("username") && (
                       <Form.Text className="text-danger">
@@ -97,17 +112,7 @@ const SignUp = () => {
                     )}
                   </Form.Group>
                 </Row>
-                <Row className="mb-3">
-                  <Form.Group as={Col} controlId="email">
-                    <Form.Label>Email</Form.Label>
-                    <Form.Control type="text" {...register("email")} />
-                    {errorMessage("email") && (
-                      <Form.Text className="text-danger">
-                        {errorMessage("email")}
-                      </Form.Text>
-                    )}
-                  </Form.Group>
-                </Row>
+
                 <Row className="mb-3">
                   <Form.Group as={Col} controlId="phone">
                     <Form.Label>Phone</Form.Label>
@@ -140,6 +145,8 @@ const SignUp = () => {
                     )}
                   </Form.Group>
                 </Row>
+
+                {/* Submit Button */}
                 <Row className="py-3">
                   <Col md="12" className="mt-2">
                     <SubmitButton

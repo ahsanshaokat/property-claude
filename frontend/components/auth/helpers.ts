@@ -36,7 +36,7 @@ export const signUpSchema = yup
     firstName: yup.string().required("FirstName is required"),
     lastName: yup.string().required("LastName is required"),
     username: yup.string().required("Username is required"),
-    email: yup.string().email().required("Email is required"),
+    email: yup.string().email(),
     phone: yup.string().required("Phone is required"),
     password: yup.string().required("Password is required"),
     role: yup.string().required("Role is required"),
