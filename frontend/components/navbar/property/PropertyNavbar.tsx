@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import { signOut, useSession } from "next-auth/react";
 import SubmitButton from "@/components/common/form/SubmitButton";
 import { useState } from "react";
+import Button from "react-bootstrap/Button";  // Ensure Button is imported
 
 const PropertyNavbar = () => {
   const router = useRouter();
@@ -61,6 +62,17 @@ const PropertyNavbar = () => {
           <Nav>
             {!session && (
               <>
+                {/* Add Property Button */}
+                <Button
+                  variant="warning"
+                  role="general-nav-add-property-btn"
+                  className={`ml-5 text-dark fw-bold ft-14 rounded-0`}
+                  onClick={() => router.push("/admin/properties/create")}
+                >
+                  Add Property
+                </Button>
+
+                {/* Sign In/Sign Up Links */}
                 <Nav.Link
                   href="/auth/signin"
                   className={`text-white ${styles.ft14}`}
