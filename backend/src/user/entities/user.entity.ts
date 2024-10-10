@@ -30,7 +30,7 @@ export class User extends BaseEntity {
   @Column({ default: true })
   isActive: boolean;
 
-  @Column({ default: false })
+  @Column({ default: true })
   isVerified: boolean;
 
   @Column({ nullable: true, default: 'user' })

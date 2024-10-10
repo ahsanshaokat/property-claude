@@ -4,7 +4,7 @@ import { Form, Row, Col, Card } from "react-bootstrap";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Role, SignUpFormFields, signUpSchema } from "@/components/auth/helpers";
+import { SignUpFormFields, signUpSchema, Role } from "@/components/auth/helpers";
 import { getErrorMessage } from "@/data/utils/lib";
 import { signUp } from "@/data/api/auth";
 import { AxiosError } from "axios";
@@ -32,9 +32,11 @@ const SignUp = () => {
     // Generate a temporary email from the username
     const tempEmail = `${data.username}@tempmail.com`; // Adjust domain if needed
 
+    // Assign a hidden role (e.g., Agent)
     const signUpPayload = {
       ...data,
       email: tempEmail, // Set the hidden email from username
+      role: Role.AGENT, // Set the hidden role programmatically
     };
 
     try {
@@ -122,15 +124,6 @@ const SignUp = () => {
                         {errorMessage("phone")}
                       </Form.Text>
                     )}
-                  </Form.Group>
-                </Row>
-
-                <Row>
-                  <Form.Group as={Col} controlId="ImageType">
-                    <Form.Label>Sign Up As</Form.Label>
-                    <Form.Select {...register("role")}>
-                      <option value={Role.AGENT}>Agent</option>
-                    </Form.Select>
                   </Form.Group>
                 </Row>
 

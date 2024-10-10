@@ -39,7 +39,7 @@ export const signUpSchema = yup
     email: yup.string().email(),
     phone: yup.string().required("Phone is required"),
     password: yup.string().required("Password is required"),
-    role: yup.string().required("Role is required"),
+    role: yup.string(),
   })
   .required();
 
