@@ -27,12 +27,13 @@ const PropertyNavbar = () => {
           role="general-navbar-brand-role"
           className={`${styles.ft18} ${styles.ftBold}`}
         >
-          <span className="text-white">ek</span>
-          <span className="text-warning">zameen</span>
+          {/* Replace text with the logo image */}
+          <img 
+            src="/images/vertical_full_white.png"  // Ensure the path to the image is correct
+            alt="ekzameen Logo"
+            style={{ height: '40px' }}  // Adjust height to fit the navbar
+          />
         </Navbar.Brand>
-
-        {/* <Navbar.Brand href="#home">React-Bootstrap</Navbar.Brand> */}
-        {/* <Navbar.Toggle aria-controls="responsive-navbar-nav" /> */}
 
         <Navbar.Toggle
           aria-controls="offcanvasNavbar"

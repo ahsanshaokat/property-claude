@@ -11,8 +11,11 @@ const AdminNavbar = () => {
       <Navbar bg="dark" expand="lg">
         <Container className="px-4" fluid>
           <Navbar.Brand href="/admin/home">
-            <span className="text-white">ek</span>
-            <span className="text-warning">zameen</span>
+            <img 
+              src="images/vertical_full_white.png"  // Ensure the path is correct for your image
+              alt="ekzameen Logo"
+              style={{ height: '40px' }} // You can adjust the size as needed
+            />
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="navbarScroll" />
           <Navbar.Collapse id="navbarScroll">

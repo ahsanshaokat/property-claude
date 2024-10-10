@@ -27,6 +27,6 @@ COPY --from=builder --chown=node:node /home/node/node_modules/ /home/node/node_m
 COPY --from=builder --chown=node:node /home/node/dist/ /home/node/dist/
 
 #inorder to run in local dev env just comment out the below line and uncomment the commented line from docker-compose file
-# EXPOSE 7890
+# EXPOSE 8080
 
 CMD ["node", "dist/main.js"]
