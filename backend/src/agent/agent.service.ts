@@ -55,6 +55,7 @@ export class AgentService {
       where: {
         user: {
           isVerified: true,
+          role: 'agent'
         },
       },
     });
