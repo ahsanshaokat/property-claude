@@ -40,8 +40,8 @@ const Home: NextPageWithLayout<HomeProps> = ({
   return (
     <>
       <Meta
-        title="Property Finder | Best property finder at your nearest location"
-        content="Best property finder at your nearest location"
+        title="ekzameen.com - Buy, Sell, or Rent Your Dream Property"
+        content="Ekzameen.com is your go-to platform for buying, selling, or renting real estate properties. Discover your dream home or perfect investment today!"
       />
       <PropertyHeader
         propertyTypes={propertyTypes}
