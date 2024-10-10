@@ -12,7 +12,7 @@ const AdminNavbar = () => {
         <Container className="px-4" fluid>
           <Navbar.Brand href="/admin/home">
             <img 
-              src="images/vertical_full_white.png"  // Ensure the path is correct for your image
+              src="/images/vertical_full_white.png"  // Ensure the path is correct for your image
               alt="ekzameen Logo"
               style={{ height: '40px' }} // You can adjust the size as needed
             />

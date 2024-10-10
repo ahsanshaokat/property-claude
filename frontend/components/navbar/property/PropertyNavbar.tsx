@@ -29,7 +29,7 @@ const PropertyNavbar = () => {
         >
           {/* Replace text with the logo image */}
           <img 
-            src="/images/vertical_full_white.png"  // Ensure the path to the image is correct
+            src="/images/vertical_full_white.png"  // Correct path for the image
             alt="ekzameen Logo"
             style={{ height: '40px' }}  // Adjust height to fit the navbar
           />
