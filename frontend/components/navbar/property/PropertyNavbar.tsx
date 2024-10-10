@@ -27,8 +27,8 @@ const PropertyNavbar = () => {
           role="general-navbar-brand-role"
           className={`${styles.ft18} ${styles.ftBold}`}
         >
-          <span className="text-white">property</span>
-          <span className="text-warning">.sonnet</span>
+          <span className="text-white">ek</span>
+          <span className="text-warning">zameen</span>
         </Navbar.Brand>
 
         {/* <Navbar.Brand href="#home">React-Bootstrap</Navbar.Brand> */}
