@@ -24,7 +24,7 @@ export default withAuth(
     callbacks: {
       authorized({ token }) {
         //console.log("token value in middleware callback", JSON.stringify(token))
-        return token?.role === "admin" || token?.role === "agent";
+        return token?.role === "admin" || token?.role === "agent" || token?.role === "user";
       },
     },
   }
