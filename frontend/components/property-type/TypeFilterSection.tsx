@@ -163,9 +163,9 @@ const TypeFilterSection: React.FC<TypeFilterProps> = ({
                   max={1000000}
                 />
                 <p className="ft-14">
-                  <span>${Number(rangeValue).toFixed(2)}</span>
+                  <span>Rs{Number(rangeValue).toFixed(2)}</span>
                   <span className="ml-2 mr-2">-</span>
-                  <span>${Number(1000000).toFixed(2)}</span>
+                  <span>Rs{Number(1000000).toFixed(2)}</span>
                 </p>
               </Form.Group>
             </Col>

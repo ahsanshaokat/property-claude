@@ -149,10 +149,10 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
                                   />
                                   <p className="ft-13">
                                     <span>
-                                      ${Number(rangeValue).toFixed(2)}
+                                      Rs{Number(rangeValue).toFixed(2)}
                                     </span>
                                     <span className="ml-2 mr-2">-</span>
-                                    <span>${Number(1000000).toFixed(2)}</span>
+                                    <span>Rs{Number(1000000).toFixed(2)}</span>
                                   </p>
                                 </Form.Group>
                               </Col>

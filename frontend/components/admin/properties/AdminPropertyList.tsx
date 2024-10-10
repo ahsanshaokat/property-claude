@@ -53,7 +53,7 @@ const AdminPropertyList: React.FC<Properties> = ({ data }) => {
                     <tr key={property.id}>
                       <td>{property.name}</td>
                       <td>{property.address}</td>
-                      <td>${property.price}</td>
+                      <td>Rs{property.price}</td>
                       <td>{property.purpose}</td>
                       <td>{property.propertyType.name}</td>
                       <td>

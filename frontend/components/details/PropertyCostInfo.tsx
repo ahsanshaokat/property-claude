@@ -16,7 +16,7 @@ const PropertyCostInfo: React.FC<PropertyCostInfoProps> = ({ data }) => {
           <SpecificationInfoDetails
             title="Utilities:"
             content={data?.utilityCost.toFixed(2) as string}
-            contentPrefix="$"
+            contentPrefix="Rs"
           />
           <SpecificationInfoDetails
             title="Electricity:"
@@ -27,7 +27,7 @@ const PropertyCostInfo: React.FC<PropertyCostInfoProps> = ({ data }) => {
           <SpecificationInfoDetails
             title="Cable TV:"
             content={data?.cableTvCost.toFixed(2) as string}
-            contentPrefix="$"
+            contentPrefix="Rs"
           />
         </Col>
       </Row>

@@ -32,13 +32,14 @@ const PropertyTypes: React.FC<PropertyTypeProps> = ({ propertyTypes }) => {
                               <Col className="py-0 px-0 ">
                                 <Card className="border-0">
                                   <Card.Body className="d-flex justify-content-center">
+                                    <span style={{"fontSize": "60px"}}>{propertyType.imageUrl}</span>
                                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                                    <img
+                                    {/* <img
                                       src={`${propertyType.imageUrl}`}
                                       width="60"
                                       height="60"
                                       alt={propertyType.name}
-                                    />
+                                    /> */}
                                   </Card.Body>
                                 </Card>
                                 <div

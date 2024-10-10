@@ -24,7 +24,7 @@ const PropertyGeneralInfo: React.FC<PropertyGeneralInfo> = ({ data }) => {
             <Col md="3" xs="12" className="py-1 mt-1">
               <div className="border-end">
                 <h2 className="ft-24 fw-bold px-1">
-                  ${data?.price.toFixed(2)}
+                  Rs{data?.price.toFixed(2)}
                   {data?.purpose === "RENT" && (
                     <span className="ft-16 text-color-b94">/mo</span>
                   )}
