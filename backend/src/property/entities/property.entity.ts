@@ -18,62 +18,62 @@ import { PropertyFeature } from './property-feature.entity';
 
 @Entity('properties')
 export class Property extends BaseEntity {
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   @Index('properties_unique_name', { unique: true })
   name: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   slug: string;
 
-  @Column({ nullable: false, length: 50 })
+  @Column({ nullable: true, length: 50 })
   purpose: string;
 
-  @Column({ nullable: false, type: 'text' })
+  @Column({ nullable: true, type: 'text' })
   descriptions: string;
 
-  @Column({ nullable: false, type: 'text' })
+  @Column({ nullable: true, type: 'text' })
   address: string;
 
-  @Column({ nullable: false, type: 'float' })
+  @Column({ nullable: true, type: 'float' })
   price: number;
 
-  @Column({ nullable: false, type: 'int' })
+  @Column({ nullable: true, type: 'int' })
   noOfBedRoom: number;
 
-  @Column({ nullable: false, type: 'int' })
+  @Column({ nullable: true, type: 'int' })
   noOfBathRoom: number;
 
-  @Column({ nullable: false, type: 'int' })
+  @Column({ nullable: true, type: 'int' })
   propertySize: number;
 
-  @Column({ nullable: false, type: 'int' })
+  @Column({ nullable: true, type: 'int' })
   yearBuild: number;
 
   @Column({ nullable: true, type: 'date' })
   publishedDate: string;
 
-  @Column({ nullable: false, type: 'int' })
+  @Column({ nullable: true, type: 'int' })
   totalFloors: number;
 
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   accommodations: string;
 
-  @Column({ nullable: false, type: 'float' })
+  @Column({ nullable: true, type: 'float' })
   ceilingHeight: number;
 
-  @Column({ nullable: false, type: 'float' })
+  @Column({ nullable: true, type: 'float' })
   distanceFromCenter: number;
 
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   parking: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   heating: string;
 
-  @Column({ nullable: false, type: 'float' })
+  @Column({ nullable: true, type: 'float' })
   areaSize: number;
 
-  @Column({ nullable: false, type: 'boolean' })
+  @Column({ nullable: true, type: 'boolean' })
   garage: boolean;
 
   @Column({ nullable: true, type: 'float' })
@@ -82,13 +82,13 @@ export class Property extends BaseEntity {
   @Column({ nullable: true })
   additionalSpec: string;
 
-  @Column({ nullable: false, type: 'int' })
+  @Column({ nullable: true, type: 'int' })
   utilityCost: number;
 
-  @Column({ nullable: false, type: 'int' })
+  @Column({ nullable: true, type: 'int' })
   cableTvCost: number;
 
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   electricityCost: string;
 
   @Column({ nullable: true, type: 'float' })

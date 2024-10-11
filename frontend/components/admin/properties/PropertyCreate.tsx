@@ -254,11 +254,11 @@ const PropertyCreate: React.FC<PropertyFormData> = ({ data }) => {
                         inputType="number"
                         errorMessage={errorMessage("propertySize")}
                       />
-                    </Col>
+                    </Col> 
                   </Row>
 
                   <Row className="mb-3">
-                    <Col md="3">
+                    {/* <Col md="3">
                       <InputField
                         labelText="Year Build"
                         // register={register}
@@ -266,7 +266,7 @@ const PropertyCreate: React.FC<PropertyFormData> = ({ data }) => {
                         inputType="number"
                         errorMessage={errorMessage("yearBuild")}
                       />
-                    </Col>
+                    </Col> */}
                     <Col md="3">
                       <InputField
                         labelText="Total Floors"
@@ -275,8 +275,24 @@ const PropertyCreate: React.FC<PropertyFormData> = ({ data }) => {
                         inputType="number"
                         errorMessage={errorMessage("totalFloors")}
                       />
+                    </Col><Col md="2">
+                      <InputField
+                        labelText="Year Build"
+                        // register={register}
+                        name="yearBuild"
+                        inputType="number"
+                        errorMessage={errorMessage("yearBuild")}
+                      />
                     </Col>
-                    <Col md="3">
+                    <Col md="6">
+                    <InputField
+                        labelText="Contact Number"
+                        // register={register}
+                        name="additionalSpec"
+                        inputType="text"
+                        errorMessage={errorMessage("additionalSpec")}
+                      /></Col>
+                    {/* <Col md="3">
                       <InputField
                         labelText="Ceiling Height (meter)"
                         // register={register}
@@ -293,11 +309,11 @@ const PropertyCreate: React.FC<PropertyFormData> = ({ data }) => {
                         inputType="text"
                         errorMessage={errorMessage("electricityCost")}
                       />
-                    </Col>
+                    </Col> */}
                   </Row>
 
                   <Row className="mb-3">
-                    <Col md="3">
+                    {/* <Col md="3">
                       <InputField
                         labelText="Distance From Center(Miles)"
                         // register={register}
@@ -323,9 +339,9 @@ const PropertyCreate: React.FC<PropertyFormData> = ({ data }) => {
                         inputType="number"
                         errorMessage={errorMessage("areaSize")}
                       />
-                    </Col>
+                    </Col> */}
                     <Col md="3">
-                      <div className="mt-4">
+                      {/* <div className="mt-4">
                         <Form.Group id="propertyGarage">
                           <Form.Check
                             type="checkbox"
@@ -333,11 +349,11 @@ const PropertyCreate: React.FC<PropertyFormData> = ({ data }) => {
                             {...register("garage")}
                           />
                         </Form.Group>
-                      </div>
+                      </div> */}
                     </Col>
                   </Row>
 
-                  <Row className="mb-3">
+                  {/* <Row className="mb-3">
                     <Col md="3">
                       <InputField
                         labelText="Accommodations"
@@ -377,9 +393,9 @@ const PropertyCreate: React.FC<PropertyFormData> = ({ data }) => {
                         errorMessage={errorMessage("cableTvCost")}
                       />
                     </Col>
-                  </Row>
+                  </Row> */}
 
-                  <Row className="mb-3">
+                  {/* <Row className="mb-3">
                     <Col md="4">
                       <InputField
                         labelText="Heating"
@@ -409,7 +425,7 @@ const PropertyCreate: React.FC<PropertyFormData> = ({ data }) => {
                         errorMessage={errorMessage("long")}
                       />
                     </Col>
-                  </Row>
+                  </Row> */}
 
                   <Row className="mb-2">
                     <h6 className="mt-1 mb-1">Features </h6>

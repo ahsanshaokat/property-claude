@@ -1,6 +1,6 @@
 import { Property } from "@/data/model/property";
 import React, { useState } from "react";
-import { Container, Row, Col, Button } from "react-bootstrap";
+import { Container, Row, Col, Button } from "react-bootstrap"; // Assuming you're using react-bootstrap
 import BathIcon from "../common/icon/Bath";
 import BedIcon from "../common/icon/Bed";
 import PropertySizeIcon from "../common/icon/PropertySize";
@@ -62,11 +62,13 @@ const PropertyGeneralInfo: React.FC<PropertyGeneralInfo> = ({ data }) => {
           </Row>
         </Col>
         <Col md="3" className="px-3">
+          {/* Replacing <a> tag with Button */}
           <Button
-            onClick={() => setModalShow(true)}
-            className="btn-warning w-100 py-2 mt-1 ft-14 fw-bold text-uppercase rounded-0"
+            variant="warning"
+            className="w-100 py-2 mt-1 ft-14 fw-bold text-uppercase rounded-0"
+            href={`tel:${data?.additionalSpec as string}`} // href is used for the 'tel' action
           >
-            Request Showing
+            Call on phone number
           </Button>
         </Col>
         <PropertyInquiryModal

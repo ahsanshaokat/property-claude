@@ -80,8 +80,6 @@ const PropertyEditForm: React.FC<PropertyEditProps> = ({
     );
     const propertyFormData = {
       ...data,
-      lat: parseFloat(data.lat),
-      long: parseFloat(data.long),
       features: itemToBeAdded,
       propertyImages: imageFiles.map((image) => image.id),
       itemToBeDeleted,
@@ -299,8 +297,16 @@ const PropertyEditForm: React.FC<PropertyEditProps> = ({
                         inputType="number"
                         errorMessage={errorMessage("totalFloors")}
                       />
+                    </Col><Col md="6">
+                      <InputField
+                        labelText="Contact Number"
+                        // register={register}
+                        name="additionalSpec"
+                        inputType="text"
+                        errorMessage={errorMessage("additionalSpec")}
+                      />
                     </Col>
-                    <Col md="3">
+                    {/* <Col md="3">
                       <InputField
                         labelText="Ceiling Height (meter)"
                         // register={register}
@@ -317,11 +323,11 @@ const PropertyEditForm: React.FC<PropertyEditProps> = ({
                         inputType="text"
                         errorMessage={errorMessage("electricityCost")}
                       />
-                    </Col>
+                    </Col> */}
                   </Row>
 
                   <Row className="mb-3">
-                    <Col md="3">
+                    {/* <Col md="3">
                       <InputField
                         labelText="Distance From Center(Miles)"
                         // register={register}
@@ -347,9 +353,9 @@ const PropertyEditForm: React.FC<PropertyEditProps> = ({
                         inputType="number"
                         errorMessage={errorMessage("areaSize")}
                       />
-                    </Col>
+                    </Col> */}
                     <Col md="3">
-                      <div className="mt-4">
+                      {/* <div className="mt-4">
                         <Form.Group id="propertyGarage">
                           <Form.Check
                             type="checkbox"
@@ -357,12 +363,12 @@ const PropertyEditForm: React.FC<PropertyEditProps> = ({
                             {...register("garage")}
                           />
                         </Form.Group>
-                      </div>
+                      </div> */}
                     </Col>
                   </Row>
 
                   <Row className="mb-3">
-                    <Col md="3">
+                    {/* <Col md="3">
                       <InputField
                         labelText="Accommodations"
                         // register={register}
@@ -370,18 +376,10 @@ const PropertyEditForm: React.FC<PropertyEditProps> = ({
                         inputType="text"
                         errorMessage={errorMessage("accommodations")}
                       />
-                    </Col>
+                    </Col> */}
 
-                    <Col md="3">
-                      <InputField
-                        labelText="Additional Spec"
-                        // register={register}
-                        name="additionalSpec"
-                        inputType="text"
-                        errorMessage={errorMessage("additionalSpec")}
-                      />
-                    </Col>
-
+                    
+{/* 
                     <Col md="3">
                       <InputField
                         labelText="Utility Cost"
@@ -390,9 +388,9 @@ const PropertyEditForm: React.FC<PropertyEditProps> = ({
                         inputType="number"
                         errorMessage={errorMessage("utilityCost")}
                       />
-                    </Col>
+                    </Col> */}
 
-                    <Col md="3">
+                    {/* <Col md="3">
                       <InputField
                         labelText="Cable Tv Cost"
                         // register={register}
@@ -400,10 +398,10 @@ const PropertyEditForm: React.FC<PropertyEditProps> = ({
                         inputType="number"
                         errorMessage={errorMessage("cableTvCost")}
                       />
-                    </Col>
+                    </Col> */}
                   </Row>
 
-                  <Row className="mb-3">
+                  {/* <Row className="mb-3">
                     <Col md="4">
                       <InputField
                         labelText="Heating"
@@ -433,7 +431,7 @@ const PropertyEditForm: React.FC<PropertyEditProps> = ({
                         errorMessage={errorMessage("long")}
                       />
                     </Col>
-                  </Row>
+                  </Row> */}
 
                   <Row className="mb-2">
                     <h6 className="mt-1 mb-1">Features </h6>

@@ -49,56 +49,6 @@ const PropertySpecifications: React.FC<PropertySpecificationsProps> = ({
           </Col>
         </Row>
       </SpecificationInfo>
-      <SpecificationInfo title="" lClSize={3} rClSize={9}>
-        <Row>
-          <Col md="6">
-            <SpecificationInfoDetails
-              title="Ceiling height:"
-              content={data?.ceilingHeight as number}
-              contentPostfix="meter"
-            />
-            <SpecificationInfoDetails
-              title="From center:"
-              content={data?.distanceFromCenter as number}
-              contentPostfix="miles"
-            />
-            <SpecificationInfoDetails
-              title="Area size:"
-              content={data?.areaSize as number}
-              contentPostfix="sq ft"
-            />
-            {data?.garageSize && (
-              <SpecificationInfoDetails
-                title="Garages size:"
-                content={data?.garageSize as number}
-                contentPostfix="sq ft"
-              />
-            )}
-          </Col>
-          <Col md="6">
-            <SpecificationInfoDetails
-              title="Parking:"
-              content={data?.parking as string}
-            />
-
-            {data?.publishedDate && (
-              <SpecificationInfoDetails
-                title="Publication date:"
-                content={data?.publishedDate as string}
-              />
-            )}
-
-            <SpecificationInfoDetails
-              title="Garages:"
-              content={data?.garage === true ? "Yes" : "No"}
-            />
-            <SpecificationInfoDetails
-              title="Additional space:"
-              content={data?.additionalSpec as string}
-            />
-          </Col>
-        </Row>
-      </SpecificationInfo>
     </>
   );
 };
