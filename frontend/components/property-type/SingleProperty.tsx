@@ -20,7 +20,7 @@ const SingleProperty: React.FC<SinglePropertyProps> = ({ property }) => {
       <Col md="5" className="mt-1 mb-1">
         <Card className="rounded-0">
           <Card.Body className="position-relative py-0 px-0">
-            {imagePath ? (
+            {(imagePath && imagePath.image_url) ? (
               // If image is available, display the image
               <img
                 src={imagePath.image_url}
