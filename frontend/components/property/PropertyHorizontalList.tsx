@@ -11,12 +11,14 @@ type PropertyListProps = {
 const PropertyHorizontalList: React.FC<PropertyListProps> = ({
   properties,
 }) => {
+  // Placeholder image URL for when no image is found
+  const placeholderImageUrl = "/images/full_logo.png"; // Path to your placeholder image
+
   return (
     <Row>
-      {
-        properties?.map((property) => {
+      {properties?.map((property) => {
         const imagePath = property.propertyImages.find(
-          (image) => image.type == "header" && image.size == "md"
+          (image) => image.type === "header" && image.size === "md"
         );
 
         return (
@@ -27,12 +29,14 @@ const PropertyHorizontalList: React.FC<PropertyListProps> = ({
             >
               <Card className="rounded-0">
                 <Card.Body className="py-0 px-0 position-relative">
+                  {/* If imagePath exists, show the actual image, otherwise show the placeholder image */}
                   <Image
-                    src={`${imagePath ? imagePath.image_url : ""}`}
+                    src={imagePath ? imagePath.image_url : placeholderImageUrl}
                     alt={property.name}
-                    width={406}
-                    height={275}
+                    width={imagePath ? 406 : 300}
+                    height={imagePath ? 275 : 204}
                     layout="responsive"
+                    style={{ objectFit: 'cover', objectPosition: 'center' }}
                   />
                 </Card.Body>
               </Card>
