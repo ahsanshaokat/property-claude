@@ -50,7 +50,7 @@ const EachRow: React.FC<SitRowProps> = ({
                   key={Number(ind).toString()}
                 >
                   <Card className={`border mt-2 text-center`}>
-                    <p>{sitInfo.price}</p>
+                    <p>Rs.{sitInfo.price}</p>
                     <p
                       className={`${styles.seatIcon}`}
                       onClick={(e) => handleClick(e, sitInfo)}

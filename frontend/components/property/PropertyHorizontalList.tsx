@@ -68,7 +68,7 @@ const PropertyHorizontalList: React.FC<PropertyListProps> = ({
                   <div className="fw-bold mt-2">
                     <Row>
                       <Col className="text-start fs-14 text-dark">
-                        ${property.price}
+                        Rs.{property.price}
                       </Col>
                     </Row>
                   </div>

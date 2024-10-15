@@ -3,6 +3,7 @@ import { BaseEntity } from '../../common/entity/base.entity';
 import { Property } from '../../property/entities/property.entity';
 import { FloorPlan } from '../../property/entities/floor-plan.entity';
 import { Agent } from '../../agent/entities/agent.entity';
+import { Project } from 'src/project/entities/project.entity';
 
 @Entity('storage_files')
 export class StorageFile extends BaseEntity {
@@ -40,4 +41,12 @@ export class StorageFile extends BaseEntity {
     onDelete: 'CASCADE',
   })
   agent: Agent;
+  
+  @ManyToOne(() => Project, (project) => project.projectImages, { // Link with Project entity
+    createForeignKeyConstraints: false,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
+  project: Project;  // Each StorageFile will be linked to a Project
+  
 }

@@ -1,5 +1,5 @@
 import { MdDashboard, MdLogin, MdManageAccounts } from "react-icons/md";
-import { FaRegUser, FaBuilding } from "react-icons/fa";
+import { FaRegUser, FaBuilding, FaProjectDiagram, FaIndustry } from "react-icons/fa"; // Added FaIndustry for Companies
 import SingleListItems from "./SingleListItems";
 import { signOut, useSession } from "next-auth/react";
 import { Button, Spinner } from "react-bootstrap";
@@ -32,6 +32,18 @@ export const sideNavItems = (role: string): SideNavItems => {
         name: "Properties",
         url: "/admin/properties",
         icon: (size: number = 21) => <FaBuilding size={size} />,
+      },
+      {
+        id: 4,
+        name: "Projects",
+        url: "/admin/projects",
+        icon: (size: number = 21) => <FaProjectDiagram size={size} />,
+      },
+      {
+        id: 5,
+        name: "Companies", // Added Companies in the navigation
+        url: "/admin/companies",
+        icon: (size: number = 21) => <FaIndustry size={size} />,
       },
     ],
 

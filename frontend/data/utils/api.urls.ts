@@ -1,5 +1,5 @@
 export const API_BASE = process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE;
-export const API_PROXY_BASE = process.env.API_PROXY_BASE || process.env.NEXT_PUBLIC_API_PROXY_BASE;
+export const API_PROXY_BASE = process.env.NEXT_PUBLIC_API_PROXY_BASE || process.env.API_PROXY_BASE;
 
 const STATIC_IMAGES = `${API_BASE}/static/`;
 const FEATURES_IMAGES = `${API_BASE}/uploads/feature/`;
@@ -22,4 +22,7 @@ export const API_URLS = {
   users: `${API_BASE}/v1/user`,
   agents: `${API_BASE}/v1/agent`,
   storageFile: `${API_BASE}/v1/storage-file`,
+  // Add the projects API URL
+  projects: `${API_BASE}/v1/projects`,
+  companies: `${API_BASE}/v1/company`, 
 };

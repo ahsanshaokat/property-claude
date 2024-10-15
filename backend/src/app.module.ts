@@ -16,6 +16,8 @@ import { AuthModule } from './auth/auth.module';
 import { DataSourceOptions } from 'typeorm';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { ProjectModule } from './project/project.module';
+import { CompanyModule } from './company/company.module';
 
 
 export const getDatabaseConfig = (
@@ -60,7 +62,9 @@ export const getDatabaseConfig = (
     UserModule,
     AgentModule,
     StorageFileModule,
-    AuthModule,
+    AuthModule,   
+    ProjectModule,
+    CompanyModule,
   ],
   controllers: [AppController],
   providers: [AppService],

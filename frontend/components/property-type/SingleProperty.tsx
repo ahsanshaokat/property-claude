@@ -63,7 +63,7 @@ const SingleProperty: React.FC<SinglePropertyProps> = ({ property }) => {
               <div className="mt-2">
                 <Row className="">
                   <Col md="12" className="text-start fs-14 fw-bold text-dark">
-                    <span className="mt-2">Rs{property.price.toFixed(2)}</span>
+                    <span className="mt-2">Rs.{property.price.toFixed(2)}</span>
                   </Col>
                 </Row>
               </div>
