@@ -1,16 +1,28 @@
-import React from "react";
-import BaseContainer from "@/components/common/container/BaseContainer";
-import { Row, Col, Card } from "react-bootstrap";
+import React, { useState, useEffect } from "react";
+import { Row, Col, Card, Button } from "react-bootstrap";
 import { GetServerSideProps } from "next";
 import { API_URLS } from "@/data/utils/api.urls";
 import { Project, ProjectResponse } from "@/data/model/project"; // Assuming you have a similar structure for Project model
 import { NextPageWithLayout } from "../_app";
+import BaseContainer from "@/components/common/container/BaseContainer";
 
 type ProjectProps = {
   project: ProjectResponse;
 };
 
 const ProjectPage: NextPageWithLayout<ProjectProps> = ({ project }) => {
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Fallback if no project images are available
+  const imagePath = project?.images?.find(
+    (image: { type: string; size: string }) =>
+      image.type === "header" && image.size === "md"
+  );
+
+  // Ensure this component only renders client-side specific content after hydration
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   if (!project) {
     console.log("Project data not found or fetch failed.");
@@ -19,41 +31,43 @@ const ProjectPage: NextPageWithLayout<ProjectProps> = ({ project }) => {
 
   const { name, description, projectType, totalArea, totalUnits, budget, estimatedRevenue, startDate, completionDate } = project;
 
-  // Fallback if no project images are available
-  const imagePath = project?.images?.find(
-    (image: { type: string; size: string }) => image.type === "header" && image.size === "md"
-  );
-
   return (
     <>
       {/* Display Project Information */}
-      <section>
-        <Row>
-          <Col
-            className="py-0"
-            style={{
-              backgroundImage: `url(${imagePath ? imagePath.image_url : ""})`,
-              backgroundPosition: "center center",
-              backgroundSize: "cover",
-              backgroundRepeat: "no-repeat",
-              minHeight: "450px",
-              height: "100%",
-            }}
-          />
-        </Row>
-        <Row className="p-4">
-          <Col md={6}>
-            <h2>{name}</h2>
-            <p><strong>Description:</strong> {description}</p>
-            <p><strong>Project Type:</strong> {projectType}</p>
-            <p><strong>Total Area:</strong> {totalArea} sq ft</p>
-            <p><strong>Total Units:</strong> {totalUnits}</p>
-            <p><strong>Budget:</strong> Rs. {budget}</p>
-            <p><strong>Estimated Revenue:</strong> Rs. {estimatedRevenue}</p>
-            <p><strong>Start Date:</strong> {new Date(startDate).toLocaleDateString()}</p>
-            <p><strong>Completion Date:</strong> {new Date(completionDate).toLocaleDateString()}</p>
-          </Col>
-        </Row>
+      <section className="mb-5">
+        <BaseContainer>
+          <Row>
+            <Col
+              className="py-0"
+              style={{
+                backgroundImage: `url(${isMounted && imagePath ? imagePath.image_url : "/default-placeholder.png"})`,
+                backgroundPosition: "center center",
+                backgroundSize: "cover",
+                backgroundRepeat: "no-repeat",
+                minHeight: "450px",
+              }}
+            />
+          </Row>
+          <Row className="py-4 px-2 mt-4">
+            <Col md={6} className="d-flex flex-column align-items-start">
+              <h2 className="fw-bold text-primary">{name}</h2>
+              <p className="mt-2"><strong>Description:</strong> {description}</p>
+              <p><strong>Project Type:</strong> {projectType}</p>
+              <p><strong>Total Area:</strong> {totalArea} sq ft</p>
+              <p><strong>Total Units:</strong> {totalUnits}</p>
+              <p><strong>Budget:</strong> Rs. {budget}</p>
+              <p><strong>Estimated Revenue:</strong> Rs. {estimatedRevenue}</p>
+              <p><strong>Start Date:</strong> {isMounted ? new Date(startDate).toLocaleDateString() : ""}</p>
+              <p><strong>Completion Date:</strong> {isMounted ? new Date(completionDate).toLocaleDateString() : ""}</p>
+
+              {/* Action Buttons */}
+              <div className="mt-3">
+                <Button variant="warning" className="me-2">Contact Us</Button>
+                <Button variant="warning">Learn More</Button>
+              </div>
+            </Col>
+          </Row>
+        </BaseContainer>
       </section>
     </>
   );
