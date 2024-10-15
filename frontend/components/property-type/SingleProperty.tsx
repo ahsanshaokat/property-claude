@@ -12,20 +12,36 @@ type SinglePropertyProps = {
 
 const SingleProperty: React.FC<SinglePropertyProps> = ({ property }) => {
   const imagePath = property.propertyImages.find(
-    (image) => image.type == "header" && image.size == "md"
+    (image) => image.type === "header" && image.size === "md"
   );
+
   return (
     <Row className="py-1 px-1 mt-3">
       <Col md="5" className="mt-1 mb-1">
         <Card className="rounded-0">
           <Card.Body className="position-relative py-0 px-0">
-            {/*eslint-disable-next-line @next/next/no-img-element*/}
-            <img
-              src={`${imagePath ? imagePath.image_url : ""}`}
-              alt={property.name}
-              className={`w-100`}
-              height={250}
-            />
+            {imagePath ? (
+              // If image is available, display the image
+              <img
+                src={imagePath.image_url}
+                alt={property.name}
+                className="w-100"
+                height={250}
+              />
+            ) : (
+              // If no image is available, display the property name in the card
+              <div
+                style={{
+                  height: 250,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: "#f0f0f0",
+                }}
+              >
+                <span className="text-dark fw-bold">{property.name}</span>
+              </div>
+            )}
           </Card.Body>
         </Card>
       </Col>
@@ -76,3 +92,4 @@ const SingleProperty: React.FC<SinglePropertyProps> = ({ property }) => {
 };
 
 export default SingleProperty;
+``
