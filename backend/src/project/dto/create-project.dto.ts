@@ -57,13 +57,15 @@ export class CreateProjectDto {
   @IsOptional()
   isActive?: boolean;
 
-  @ApiProperty({ 
-    type: 'array', 
-    items: { type: 'string', format: 'binary' }, 
-    description: 'Array of images to be uploaded for the project', 
-    required: false 
-  })
-  @IsOptional()
-  @IsArray()
-  images?: Express.Multer.File[];  // This property is optional and will hold multiple file uploads
+  images?: any;
+
+  // @ApiProperty({ 
+  //   type: 'array', 
+  //   items: { type: 'string', format: 'binary' }, 
+  //   description: 'Array of images to be uploaded for the project', 
+  //   required: false 
+  // })
+  // @IsOptional()
+  // @IsArray()
+  // images?: Express.Multer.File[];  // This property is optional and will hold multiple file uploads
 }

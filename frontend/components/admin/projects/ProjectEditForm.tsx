@@ -36,14 +36,14 @@ const ProjectEditForm: React.FC<ProjectEditProps> = ({
   projectData,
 }) => {
   const [project] = useState(projectData);
-  const [imageType, setImageType] = useState("");
-  const [imageFiles, setImageFiles] = useState<Image[]>([]);
+  const [imageFiles, setImageFiles] = useState<Image[]>([]); // State to track uploaded images
   const [existingImageFiles, setExistingImageFiles] = useState<Image[]>(
-    projectData.images || []
+    projectData.projectImages || []
   );
   const [loading, setLoading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [deleting, setDeleting] = useState(0);
+  const [imageType, setImageType] = useState(""); // Track the image type (e.g., header, feature, etc.)
   const router = useRouter();
 
   const availableProjectTypes = projectTypes || [];
@@ -52,28 +52,38 @@ const ProjectEditForm: React.FC<ProjectEditProps> = ({
     resolver: yupResolver(projectSchema),
     mode: "onTouched",
   });
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    setValue,
-  } = methods;
+  const { register, handleSubmit, formState: { errors }, setValue } = methods;
 
   useEffect(() => {
     setProjectEditForm(project, setValue);
   }, [project, setValue]);
 
   const onSubmit = async (data: ProjectFormFields) => {
-    const projectFormData = {
-      ...data,
-      projectImages: imageFiles.map((image) => image.id),
-    };
+    const formData = new FormData();
+
+    // Append form fields
+    formData.append("name", data.name);
+    formData.append("description", data.description);
+    formData.append("projectType", data.projectType);
+    formData.append("totalArea", String(data.totalArea));
+    formData.append("totalUnits", String(data.totalUnits));
+    formData.append("budget", String(data.budget));
+    formData.append("estimatedRevenue", String(data.estimatedRevenue));
+    formData.append("startDate", data.startDate.toISOString());
+    formData.append("completionDate", data.completionDate.toISOString());
+
+    console.log("imageFiles", imageFiles)
+
+    // Append image IDs (if necessary) or files directly
+    imageFiles.forEach((image, index) => {
+      formData.append(`projectImages[${index}]`, image.id);
+    });
 
     setSubmitLoading(true);
 
     try {
-      const projectEdit = await editProject(project.id, projectFormData);
-      if (projectEdit.status == 200) {
+      const projectEdit = await editProject(project.id, formData);
+      if (projectEdit.status === 200) {
         router.push("/admin/projects");
       } else {
         setSubmitLoading(false);
@@ -108,28 +118,30 @@ const ProjectEditForm: React.FC<ProjectEditProps> = ({
   };
 
   const handleFileUpload = (e: SyntheticEvent) => {
-    if (!imageType) {
-      alert("Please select an image type");
-      return;
-    }
     const target = e.target as HTMLInputElement;
     const files = target.files instanceof FileList ? target.files : null;
     if (!files) {
       return;
     }
+
+    // Prepare form data
     const formData = new FormData();
-    formData.append("type", imageType);
-    formData.append("size", "md");
-    formData.append("fileName", files[0]);
+    formData.append("file", files[0]); // Add the file itself
+    formData.append("type", imageType); // Add the image type
+    formData.append("fileName", files[0].name); // Add the file name
+
     setLoading(true);
+
+    // Upload the file and data to the API
     uploadImage(formData)
       .then((res) => {
         setLoading(false);
-        target.value = "";
-        setImageFiles([...imageFiles, res.data]);
-        setExistingImageFiles([...existingImageFiles, res.data]);
+        target.value = ""; // Reset the file input
+        setImageFiles([...imageFiles, res.data]); // Add the uploaded file to state
+        setExistingImageFiles([...existingImageFiles, res.data]); // Update the existing image list
       })
       .catch((error) => {
+        setLoading(false);
         console.log(error.message);
       });
   };
@@ -249,6 +261,17 @@ const ProjectEditForm: React.FC<ProjectEditProps> = ({
                   {/* Image Upload Section */}
                   <Row className="mb-3">
                     <Col md="6">
+                      <Form.Group controlId="imageTypeSelect">
+                        <Form.Label>Select Image Type</Form.Label>
+                        <Form.Select
+                          value={imageType}
+                          onChange={(e) => setImageType(e.target.value)}
+                        >
+                          <option value="">Select type</option>
+                          <option value="header">Header</option>
+                          <option value="feature">Feature</option>
+                        </Form.Select>
+                      </Form.Group>
                       <Form.Group controlId="imageUpload">
                         <Form.Label>Upload Project Images</Form.Label>
                         <Form.Control
@@ -257,13 +280,6 @@ const ProjectEditForm: React.FC<ProjectEditProps> = ({
                           onChange={handleFileUpload}
                         />
                       </Form.Group>
-                      <Button
-                        variant="secondary"
-                        className="mt-2"
-                        onClick={() => setImageType("project")}
-                      >
-                        Set Image Type
-                      </Button>
                     </Col>
                   </Row>
 

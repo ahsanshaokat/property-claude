@@ -50,6 +50,7 @@ export type ProjectFormData = {
 };
 
 export type ProjectFormFields = {
+  totalUnits(totalUnits: any): string | Blob;
   name: string;
   description: string;
   projectType: number;

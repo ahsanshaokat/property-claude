@@ -3,6 +3,7 @@ import { Image } from "./image-file";
 import { PropertyType } from "./property-type"; // If projects have types as well
 
 export type Project = {
+  projectImages: never[];
   id: number;
   created_at: string;
   updated_at: string;

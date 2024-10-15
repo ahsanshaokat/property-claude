@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -67,7 +68,7 @@ export class ProjectService {
   async update(
     id: number,
     updateProjectDto: UpdateProjectDto,
-    images: Express.Multer.File[],
+    projectImages: Express.Multer.File[],
   ) {
     const project = await this.projectRepository.preload({
       id,
@@ -78,9 +79,10 @@ export class ProjectService {
       throw new NotFoundException(`Project with ID ${id} not found`);
     }
 
+    console.log("=====project images=====", project)
     // Handle image updates if new images are provided
-    if (images && images.length > 0) {
-      await this.storageFileService.uploadProjectImages(images, project.id);
+    if (projectImages && projectImages.length > 0) {
+      await this.storageFileService.uploadProjectImages(projectImages, project.id);
     }
 
     return await this.projectRepository.save(project);
@@ -96,3 +98,4 @@ export class ProjectService {
     await this.projectRepository.remove(project);
   }
 }
+
