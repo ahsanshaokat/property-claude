@@ -11,9 +11,6 @@ type PropertyListProps = {
 const PropertyHorizontalList: React.FC<PropertyListProps> = ({
   properties,
 }) => {
-  // Placeholder image URL for when no image is found
-  const placeholderImageUrl = "/images/full_logo.png"; // Path to your placeholder image
-
   return (
     <Row>
       {properties?.map((property) => {
@@ -29,15 +26,32 @@ const PropertyHorizontalList: React.FC<PropertyListProps> = ({
             >
               <Card className="rounded-0">
                 <Card.Body className="py-0 px-0 position-relative">
-                  {/* If imagePath exists, show the actual image, otherwise show the placeholder image */}
-                  <Image
-                    src={imagePath ? imagePath.image_url : placeholderImageUrl}
-                    alt={property.name}
-                    width={imagePath ? 406 : 300}
-                    height={imagePath ? 275 : 204}
-                    layout="responsive"
-                    style={{ objectFit: 'cover', objectPosition: 'center' }}
-                  />
+                  {imagePath ? (
+                    // If image is found, display the image
+                    <Image
+                      src={imagePath.image_url}
+                      alt={property.name}
+                      width={406}
+                      height={275}
+                      layout="responsive"
+                    />
+                  ) : (
+                    // If no image is found, display a placeholder with the property name
+                    <div
+                      style={{
+                        width: "100%",
+                        height: 275,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        backgroundColor: "#f0f0f0",
+                      }}
+                    >
+                      <span className="text-dark fw-bold">
+                        {property.name}
+                      </span>
+                    </div>
+                  )}
                 </Card.Body>
               </Card>
               <div className="border">
