@@ -3,7 +3,7 @@ import { View, Text, FlatList, StyleSheet, TextInput, Image, TouchableOpacity, S
 import Icon from 'react-native-vector-icons/MaterialIcons'; // For icons
 import AsyncStorage from '@react-native-async-storage/async-storage'; // For storing and retrieving user tokens
 import { getProperties, getPropertyTypes, getCities } from '../data/api/propertyApi'; // Import the functions
-import AuthWrapper from './authWrapper';
+import AuthWrapper from './AuthWrapper';
 
 const HomeScreen = ({ navigation }) => {
   const [selectedTab, setSelectedTab] = useState('Residential');

@@ -1,5 +1,5 @@
-// export const API_BASE = 'https://apis.ekzameen.com';
-export const API_BASE = 'http://localhost:7890';
+export const API_BASE = 'http://apis.ekzameen.com';
+// export const API_BASE = 'http://localhost:7890';
 
 const STATIC_IMAGES = `${API_BASE}/static/`;
 const FEATURES_IMAGES = `${API_BASE}/uploads/feature/`;

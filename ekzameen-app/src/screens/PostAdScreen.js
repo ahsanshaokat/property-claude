@@ -1,13 +1,10 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, ScrollView, Switch, Picker, ActivityIndicator, CheckBox, Alert } from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker'; // For selecting images
 import { getPropertyTypes, getCities, getFeatures, createProperty, uploadImage } from '../data/api/propertyApi'; // Assuming these are defined
-import * as mime from 'mime';
-import { AuthContext } from '../data/context/AuthContext'; // Assuming you have AuthContext
-
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
 
 const PostAdScreen = ({ navigation }) => {
-  const { accessToken } = useContext(AuthContext); // Get the accessToken from context
   const [purpose, setPurpose] = useState('SALE'); // Toggle between Sell and Rent
   const [propertyType, setPropertyType] = useState(''); // Property Type
   const [city, setCity] = useState(''); // City
@@ -95,15 +92,12 @@ const PostAdScreen = ({ navigation }) => {
     formData.append('fileName', fileName); // Add the file name to FormData
     formData.append('file', selectedFile); // Add the file as binary data
 
-    console.log('FormData:', formData);
-
     setLoading(true);
 
     // API call to upload the image
     uploadImage(formData)
       .then((res) => {
         setLoading(false);
-        console.log('Upload successful:', res.data);
         setImageFiles([...imageFiles, res.data]); // Save the uploaded file details
         Alert.alert('Image uploaded successfully');
       })
@@ -117,30 +111,36 @@ const PostAdScreen = ({ navigation }) => {
     target.value = '';
   };
   
-
   const handlePostAd = async () => {
     const adData = {
       purpose,
-      propertyType,
-      city,
-      propertySize,
-      price,
-      noOfBathRoom: bathrooms,
-      noOfBedRoom: bedrooms,
+      propertyType: parseInt(propertyType), // Convert to integer
+      city: parseInt(city), // Convert to integer
+      propertySize: parseInt(propertySize), // Convert to integer
+      price: parseInt(price), // Convert to integer
+      noOfBathRoom: parseInt(bathrooms), // Convert to integer
+      noOfBedRoom: parseInt(bedrooms), // Convert to integer
       name: title,
       descriptions: description,
       additionalSpec: contactNumber,
       address,
-      totalFloors,
-      yearBuild,
+      totalFloors: parseInt(totalFloors), // Convert to integer
+      yearBuild: parseInt(yearBuild), // Convert to integer
       features: selectedFeatures, // Add selected features to the payload
-      propertyImages: imageFiles, // Add uploaded images to the payload
+      propertyImages: imageFiles.map(file => file.id), // Pass only the image IDs
       lat: null,
       long: null,
     };
     
     try {
-      await createProperty(adData, accessToken);
+      // Fetch the accessToken from AsyncStorage
+      const accessToken = await AsyncStorage.getItem('accessToken');
+
+      if (!accessToken) {
+        Alert.alert('Error', 'User not authenticated');
+        return;
+      }
+      await createProperty(adData, accessToken); // Pass the access token to the API
       Alert.alert('Ad posted successfully!');
       navigation.goBack();
     } catch (error) {
@@ -201,7 +201,7 @@ const PostAdScreen = ({ navigation }) => {
             </Picker>
           </View>
           
-          {/* Area Size */}
+          {/* Other fields */}
           <View style={styles.section}>
             <Text style={styles.sectionHeader}>Area Size (Sq. Ft.)</Text>
             <TextInput 
@@ -212,8 +212,7 @@ const PostAdScreen = ({ navigation }) => {
               keyboardType="numeric"
             />
           </View>
-          
-          {/* Price */}
+
           <View style={styles.section}>
             <Text style={styles.sectionHeader}>Total Price (PKR)</Text>
             <TextInput 
@@ -225,7 +224,6 @@ const PostAdScreen = ({ navigation }) => {
             />
           </View>
 
-          {/* Installments Available */}
           <View style={styles.section}>
             <Text style={styles.sectionHeader}>Installments Available</Text>
             <Switch
@@ -234,7 +232,6 @@ const PostAdScreen = ({ navigation }) => {
             />
           </View>
 
-          {/* Ready for Possession */}
           <View style={styles.section}>
             <Text style={styles.sectionHeader}>Ready for Possession</Text>
             <Switch
@@ -243,7 +240,6 @@ const PostAdScreen = ({ navigation }) => {
             />
           </View>
 
-          {/* Bedrooms */}
           <View style={styles.section}>
             <Text style={styles.sectionHeader}>Bedrooms</Text>
             <TextInput 
@@ -255,7 +251,6 @@ const PostAdScreen = ({ navigation }) => {
             />
           </View>
 
-          {/* Bathrooms */}
           <View style={styles.section}>
             <Text style={styles.sectionHeader}>Bathrooms</Text>
             <TextInput 
@@ -267,7 +262,6 @@ const PostAdScreen = ({ navigation }) => {
             />
           </View>
 
-          {/* Title */}
           <View style={styles.section}>
             <Text style={styles.sectionHeader}>Property Title</Text>
             <TextInput 
@@ -278,7 +272,6 @@ const PostAdScreen = ({ navigation }) => {
             />
           </View>
 
-          {/* Description */}
           <View style={styles.section}>
             <Text style={styles.sectionHeader}>Property Description</Text>
             <TextInput 
@@ -290,7 +283,6 @@ const PostAdScreen = ({ navigation }) => {
             />
           </View>
 
-          {/* Address */}
           <View style={styles.section}>
             <Text style={styles.sectionHeader}>Address</Text>
             <TextInput 
@@ -301,7 +293,6 @@ const PostAdScreen = ({ navigation }) => {
             />
           </View>
 
-          {/* Year Build */}
           <View style={styles.section}>
             <Text style={styles.sectionHeader}>Year Build</Text>
             <TextInput 
@@ -313,19 +304,17 @@ const PostAdScreen = ({ navigation }) => {
             />
           </View>
 
-          {/* Total Floors */}
           <View style={styles.section}>
             <Text style={styles.sectionHeader}>Total Floors</Text>
             <TextInput 
               style={styles.input}
-              value={totalFloors.toString()}
+              value={totalFloors}
               onChangeText={setTotalFloors}
               placeholder="Enter total floors" 
               keyboardType="numeric"
             />
           </View>
 
-          {/* Contact Number */}
           <View style={styles.section}>
             <Text style={styles.sectionHeader}>Contact Number</Text>
             <TextInput 
