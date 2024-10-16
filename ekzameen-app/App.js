@@ -13,6 +13,7 @@ import PostAdScreen from './src/screens/PostAdScreen';
 import PropertyTypesScreen from './src/screens/PropertyTypesScreen';
 import { enableScreens } from 'react-native-screens';
 import Icon from 'react-native-vector-icons/MaterialIcons';  // Icon library
+import SearchResultsScreen from './src/screens/SearchResultsScreen'; // Import the new screen
 
 // Enable react-native-screens for better performance
 enableScreens();
@@ -33,6 +34,7 @@ const MainStack = () => (
     <Stack.Screen name="Login" component={LoginScreen} />
     <Stack.Screen name="SignUp" component={SignUpScreen} />
     <Stack.Screen name="ForgotUsername" component={ForgotUsernameScreen} />
+    <Stack.Screen name="SearchResults" component={SearchResultsScreen} options={{ headerShown: true }} />
   </Stack.Navigator>
 );
 

@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "WebViewApp",
-    "slug": "WebViewApp",
+    "name": "ekzameen.com",
+    "slug": "ekzameen.com",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -19,7 +19,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.ahsanshaokat.WebViewApp"
+      "package": "com.ahsanshaokat.ekzameen.com"
     },
     "web": {
       "favicon": "./assets/favicon.png"

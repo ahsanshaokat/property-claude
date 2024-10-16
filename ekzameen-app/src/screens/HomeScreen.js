@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, TextInput, Image, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';  // For icons
-
-// API URL
-const API_URL = "https://apis.ekzameen.com/v1/property?page=1&perPage=12&order[updated_at]=DESC";
+import Icon from 'react-native-vector-icons/MaterialIcons'; // For icons
+import { getProperties } from '../data/api/propertyApi'; // Import the function
 
 // Mock property categories (as before)
 const categories = {
@@ -30,12 +28,12 @@ const categories = {
 };
 
 // Render category item
-const renderCategoryItem = ({ item }) => (
-  <View style={styles.categoryItem}>
+const renderCategoryItem = ({ item, onPress }) => (
+  <TouchableOpacity onPress={onPress} style={styles.categoryItem}>
     <Icon name={item.icon} size={40} color={item.color} />
     <Text style={styles.categoryName}>{item.name}</Text>
     <Text style={styles.categoryCount}>({item.count})</Text>
-  </View>
+  </TouchableOpacity>
 );
 
 const HomeScreen = ({ navigation }) => {
@@ -46,13 +44,12 @@ const HomeScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch data from the API
+    // Fetch data from the API using the getProperties function
     const fetchProperties = async () => {
       try {
-        const response = await fetch(API_URL);
-        const json = await response.json();
-        if (json.success) {
-          setProperties(json.data);
+        const response = await getProperties("?page=1&perPage=12&order[updated_at]=DESC"); // Call the API function
+        if (response.data.success) {
+          setProperties(response.data.data);
         }
       } catch (error) {
         console.error("Error fetching properties: ", error);
@@ -63,6 +60,18 @@ const HomeScreen = ({ navigation }) => {
 
     fetchProperties();
   }, []);
+
+  // Function to handle search action
+  const handleSearch = () => {
+    if (searchTerm) {
+      navigation.navigate('SearchResults', { searchTerm });
+    }
+  };
+
+  // Function to handle category click
+  const handleCategoryClick = (category) => {
+    navigation.navigate('SearchResults', { category });
+  };
 
   const renderProperty = ({ item }) => (
     <TouchableOpacity onPress={() => navigation.navigate('PropertyDetails', { propertyId: item.id })}>
@@ -126,9 +135,9 @@ const HomeScreen = ({ navigation }) => {
               value={searchTerm}
               onChangeText={setSearchTerm}
             />
-            <TouchableOpacity style={styles.locationButton}>
-              <Text style={styles.locationText}>Lahore</Text>
-              <Icon name="keyboard-arrow-down" size={20} color="#000" />
+            <TouchableOpacity style={styles.locationButton} onPress={handleSearch}>
+              <Text style={styles.locationText}>Search</Text>
+              <Icon name="search" size={20} color="#000" />
             </TouchableOpacity>
           </View>
         </View>
@@ -149,7 +158,7 @@ const HomeScreen = ({ navigation }) => {
         {/* Subcategory Grid */}
         <FlatList
           data={categories[selectedTab]}
-          renderItem={renderCategoryItem}
+          renderItem={({ item }) => renderCategoryItem({ item, onPress: () => handleCategoryClick(item.name) })}
           keyExtractor={(item) => item.id.toString()}
           numColumns={3}
           columnWrapperStyle={styles.categoryRow}
@@ -182,9 +191,7 @@ const HomeScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f2f2f2' },
-
   scrollContainer: { paddingBottom: 100 },
-
   floatingButton: {
     backgroundColor: '#ffc107',
     width: 60,
@@ -202,7 +209,6 @@ const styles = StyleSheet.create({
     fontSize: 36,
     fontWeight: 'bold',
   },
-
   topSection: {
     backgroundColor: '#008a43',
     paddingVertical: 20,
@@ -210,7 +216,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     position: 'relative',
   },
-
   backgroundImage: {
     position: 'absolute',
     bottom: 0,
@@ -219,7 +224,6 @@ const styles = StyleSheet.create({
     height: 100,
     opacity: 1.3,
   },
-
   toggleContainer: {
     flexDirection: 'row',
     backgroundColor: '#fff',
@@ -227,30 +231,24 @@ const styles = StyleSheet.create({
     padding: 4,
     marginBottom: 15,
   },
-
   toggleButton: {
     paddingVertical: 10,
     paddingHorizontal: 40,
     borderRadius: 20,
   },
-
   activeButton: {
     backgroundColor: '#008a43',
   },
-
   toggleText: {
     fontSize: 16,
   },
-
   activeToggleText: {
     color: '#fff',
     fontWeight: 'bold',
   },
-
   inactiveToggleText: {
     color: '#008a43',
   },
-
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -263,61 +261,50 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 2,
   },
-
   searchBar: {
     flex: 1,
     paddingVertical: 8,
     fontSize: 16,
   },
-
   locationButton: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 10,
   },
-
   locationText: {
     marginRight: 5,
     color: '#008a43',
     fontSize: 16,
   },
-
   tabsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     backgroundColor: '#fff',
     paddingVertical: 10,
   },
-
   tab: {
     paddingVertical: 10,
     borderBottomWidth: 2,
     borderColor: '#f9f9f9',
   },
-
   activeTab: {
     borderColor: '#008a43',
   },
-
   tabText: {
     color: '#008a43',
     fontWeight: 'bold',
   },
-
   activeTabText: {
     color: '#008a43',
     fontWeight: 'bold',
   },
-
   categoryGrid: {
     paddingHorizontal: 15,
   },
-
   categoryRow: {
     justifyContent: 'space-between',
     marginBottom: 10,
   },
-
   categoryItem: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -326,22 +313,18 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: '#f7f7f7',
   },
-
   categoryName: {
     fontSize: 14,
     color: '#333',
     marginTop: 5,
     textAlign: 'center',
   },
-
   categoryCount: {
     fontSize: 12,
     color: '#666',
     textAlign: 'center',
   },
-
   propertyList: { padding: 10 },
-
   propertyCard: {
     flexDirection: 'row',
     padding: 15,
@@ -351,7 +334,6 @@ const styles = StyleSheet.create({
     elevation: 2,
     position: 'relative', // For fixed tag position
   },
-
   propertyTag: {
     backgroundColor: '#008a43',
     borderRadius: 5,
@@ -362,57 +344,46 @@ const styles = StyleSheet.create({
     top: 10,
     width: 50,
   },
-
   saleTag: {
     backgroundColor: '#ffc107',
   },
-
   rentTag: {
     backgroundColor: '#ff5733',
   },
-
   tagText: {
     fontSize: 12,
     color: '#fff',
     fontWeight: 'bold',
     textAlign: 'center',
   },
-
   propertyImage: {
     width: 100,
     height: 100,
     borderRadius: 10,
     marginRight: 15,
   },
-
   propertyInfo: { flex: 1, justifyContent: 'center' },
-
   propertyTitle: { fontSize: 18, fontWeight: 'bold' },
-
   propertyLocation: {
     fontSize: 14,
     color: '#666',
     marginTop: 5,
   },
-
   propertyDetails: {
     flexDirection: 'row',
     marginTop: 5,
     marginBottom: 10,
   },
-
   propertyDetailItem: {
     flexDirection: 'row',
     alignItems: 'center',
     marginRight: 15,
   },
-
   detailText: {
     fontSize: 14,
     color: '#008a43',
     marginLeft: 5,
   },
-
   propertyPrice: {
     fontSize: 18,
     fontWeight: 'bold',
