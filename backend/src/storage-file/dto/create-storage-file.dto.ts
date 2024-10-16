@@ -8,6 +8,6 @@ export class CreateStorageFileDto {
   @IsNotEmpty()
   size: string;
 
-  // Remove the validation requirement for fileName since it's auto-generated
-  fileName?: string;
+  @IsOptional()
+  fileName: string;
 }

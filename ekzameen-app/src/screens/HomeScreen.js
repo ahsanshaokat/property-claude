@@ -1,79 +1,132 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, TextInput, Image, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TextInput, Image, TouchableOpacity, ScrollView, ActivityIndicator, TouchableWithoutFeedback } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons'; // For icons
-import { getProperties } from '../data/api/propertyApi'; // Import the function
-
-// Mock property categories (as before)
-const categories = {
-  Residential: [
-    { id: 1, name: 'Houses', icon: 'house', count: 8, color: '#2E7D32' },
-    { id: 2, name: 'Flats', icon: 'hotel', count: 0, color: '#388E3C' },
-    { id: 3, name: 'Pent House', icon: 'apartment', count: 0, color: '#43A047' },
-    { id: 4, name: 'Farm House', icon: 'agriculture', count: 0, color: '#66BB6A' },
-    { id: 5, name: 'Apartments', icon: 'apartment', count: 0, color: '#81C784' },
-  ],
-  Commercial: [
-    { id: 6, name: 'Shops', icon: 'storefront', count: 0, color: '#2E7D32' },
-    { id: 7, name: 'Offices', icon: 'business', count: 0, color: '#388E3C' },
-    { id: 8, name: 'Warehouses', icon: 'store', count: 1, color: '#43A047' },
-    { id: 9, name: 'Factories', icon: 'factory', count: 0, color: '#66BB6A' },
-    { id: 10, name: 'Industrial Land', icon: 'domain', count: 0, color: '#81C784' },
-  ],
-  Plots: [
-    { id: 11, name: 'Residential Plot', icon: 'map', count: 1, color: '#2E7D32' },
-    { id: 12, name: 'Commercial Plot', icon: 'map', count: 0, color: '#388E3C' },
-    { id: 13, name: 'Plot Files', icon: 'insert-drive-file', count: 0, color: '#43A047' },
-    { id: 14, name: 'Plot Forms', icon: 'description', count: 0, color: '#66BB6A' },
-  ],
-};
-
-// Render category item
-const renderCategoryItem = ({ item, onPress }) => (
-  <TouchableOpacity onPress={onPress} style={styles.categoryItem}>
-    <Icon name={item.icon} size={40} color={item.color} />
-    <Text style={styles.categoryName}>{item.name}</Text>
-    <Text style={styles.categoryCount}>({item.count})</Text>
-  </TouchableOpacity>
-);
+import AsyncStorage from '@react-native-async-storage/async-storage'; // For storing and retrieving user tokens
+import { getProperties, getPropertyTypes, getCities } from '../data/api/propertyApi'; // Import the functions
+import AuthWrapper from './authWrapper';
 
 const HomeScreen = ({ navigation }) => {
   const [selectedTab, setSelectedTab] = useState('Residential');
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedOption, setSelectedOption] = useState('Buy');
+  const [selectedOption, setSelectedOption] = useState('Buy'); // Buy or Rent (this will set the 'purpose')
   const [properties, setProperties] = useState([]);
+  const [propertyTypes, setPropertyTypes] = useState([]);
+  const [cities, setCities] = useState([]);
+  const [selectedCity, setSelectedCity] = useState({ id: 14, name: 'Lahore' });
+  const [cityDropdownOpen, setCityDropdownOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // State to check login status
 
+  // Check if the user is logged in when the component mounts
   useEffect(() => {
-    // Fetch data from the API using the getProperties function
-    const fetchProperties = async () => {
+    const checkLoginStatus = async () => {
       try {
-        const response = await getProperties("?page=1&perPage=12&order[updated_at]=DESC"); // Call the API function
-        if (response.data.success) {
-          setProperties(response.data.data);
+        const accessToken = await AsyncStorage.getItem('accessToken');
+        if (accessToken) {
+          setIsLoggedIn(true);
+        } else {
+          setIsLoggedIn(false);
         }
       } catch (error) {
-        console.error("Error fetching properties: ", error);
+        console.error('Error checking login status:', error);
+      }
+    };
+    checkLoginStatus();
+  }, []);
+
+  // Fetch properties, property types, and cities
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const propertyResponse = await getProperties("?page=1&perPage=12&order[updated_at]=DESC");
+        const typesResponse = await getPropertyTypes();
+        const citiesResponse = await getCities();
+
+        if (propertyResponse.data.success && typesResponse && citiesResponse) {
+          setProperties(propertyResponse.data.data); // Set properties list
+          setPropertyTypes(typesResponse.data); // Set property types
+          setCities(citiesResponse.data); // Set cities list
+        }
+      } catch (error) {
+        console.error("Error fetching data: ", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProperties();
+    fetchData();
   }, []);
+
+  const handleAddProperty = () => {
+    if (!isLoggedIn) {
+      navigation.navigate('Login');
+    } else {
+      navigation.navigate('PostAd');
+    }
+  };
 
   // Function to handle search action
   const handleSearch = () => {
     if (searchTerm) {
-      navigation.navigate('SearchResults', { searchTerm });
+      navigation.navigate('SearchResults', { searchTerm, cityId: selectedCity.id });
     }
   };
 
   // Function to handle category click
-  const handleCategoryClick = (category) => {
-    navigation.navigate('SearchResults', { category });
+  const handleCategoryClick = (alias) => {
+    navigation.navigate('SearchResults', { 
+      propertyType: alias, 
+    });
   };
 
-  const renderProperty = ({ item }) => (
+  // Function to close city dropdown when clicked outside
+  const closeCityDropdown = () => {
+    if (cityDropdownOpen) {
+      setCityDropdownOpen(false);
+    }
+  };
+
+  // Render category item
+  const renderCategoryItem = ({ item }) => (
+    <TouchableOpacity onPress={() => handleCategoryClick(item.alias)} style={styles.categoryItem}>
+      {item.imageUrl.startsWith('http') ? (
+        <Image source={{ uri: item.imageUrl }} style={styles.categoryIcon} />
+      ) : (
+        <Text style={[styles.textIcon, { color: '#008a43' }]}>{item.imageUrl || '🏠'}</Text> // Theme green color
+      )}
+      <Text style={styles.categoryName}>{item.name}</Text>
+      <Text style={styles.categoryCount}>({item.propertyCount || 0})</Text>
+    </TouchableOpacity>
+  );
+
+  // Render cities dropdown
+  const renderCityDropdown = () => (
+    <View style={styles.cityDropdownContainer}>
+      <TouchableOpacity style={styles.locationButton} onPress={() => setCityDropdownOpen(!cityDropdownOpen)}>
+        <Text style={styles.locationText}>{selectedCity.name}</Text>
+        <Icon name="keyboard-arrow-down" size={20} color="#000" />
+      </TouchableOpacity>
+      {cityDropdownOpen && (
+        <View style={styles.cityDropdown}>
+          {cities.map((city) => (
+            <TouchableOpacity
+              key={city.id}
+              onPress={() => {
+                setSelectedCity(city);
+                setCityDropdownOpen(false);
+              }}
+              style={styles.cityOption}
+            >
+              <Text>{city.name}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
+    </View>
+  );
+
+  // Render property item
+  const renderPropertyItem = ({ item }) => (
     <TouchableOpacity onPress={() => navigation.navigate('PropertyDetails', { propertyId: item.id })}>
       <View style={styles.propertyCard}>
         <View style={[styles.propertyTag, item.purpose === 'SALE' ? styles.saleTag : styles.rentTag]}>
@@ -86,7 +139,7 @@ const HomeScreen = ({ navigation }) => {
           <View style={styles.propertyDetails}>
             <View style={styles.propertyDetailItem}>
               <Icon name="king-bed" size={18} color="#008a43" />
-              <Text style={styles.detailText}>{item.noOfBedRoom} Rooms</Text>
+              <Text style={styles.detailText}>{item.noOfBedRoom} Beds</Text>
             </View>
             <View style={styles.propertyDetailItem}>
               <Icon name="bathtub" size={18} color="#008a43" />
@@ -104,88 +157,82 @@ const HomeScreen = ({ navigation }) => {
   );
 
   return (
-    <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {/* Top section including the logo, Buy/Rent toggle, and search bar */}
-        <View style={styles.topSection}>
-          <Image
-            source={{ uri: 'https://ekzameen.com/_next/static/media/headerbg.42b8ac70.png' }}
-            style={styles.backgroundImage}
-          />
+    <TouchableWithoutFeedback onPress={closeCityDropdown}>
+      <AuthWrapper navigation={navigation}>
+        <View style={styles.container}>
+          <ScrollView contentContainerStyle={styles.scrollContainer}>
+            {/* Top section including the logo, Buy/Rent toggle, and search bar */}
+            <View style={styles.topSection}>
+              <Image
+                source={{ uri: 'https://ekzameen.com/_next/static/media/headerbg.42b8ac70.png' }}
+                style={styles.backgroundImage}
+              />
 
-          <View style={styles.toggleContainer}>
-            <TouchableOpacity
-              style={[styles.toggleButton, selectedOption === 'Buy' && styles.activeButton]}
-              onPress={() => setSelectedOption('Buy')}
-            >
-              <Text style={[styles.toggleText, selectedOption === 'Buy' ? styles.activeToggleText : styles.inactiveToggleText]}>Buy</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.toggleButton, selectedOption === 'Rent' && styles.activeButton]}
-              onPress={() => setSelectedOption('Rent')}
-            >
-              <Text style={[styles.toggleText, selectedOption === 'Rent' ? styles.activeToggleText : styles.inactiveToggleText]}>Rent</Text>
-            </TouchableOpacity>
-          </View>
+              <View style={styles.toggleContainer}>
+                <TouchableOpacity
+                  style={[styles.toggleButton, selectedOption === 'Buy' && styles.activeButton]}
+                  onPress={() => setSelectedOption('Buy')}
+                >
+                  <Text style={[styles.toggleText, selectedOption === 'Buy' ? styles.activeToggleText : styles.inactiveToggleText]}>Buy</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.toggleButton, selectedOption === 'Rent' && styles.activeButton]}
+                  onPress={() => setSelectedOption('Rent')}
+                >
+                  <Text style={[styles.toggleText, selectedOption === 'Rent' ? styles.activeToggleText : styles.inactiveToggleText]}>Rent</Text>
+                </TouchableOpacity>
+              </View>
 
-          <View style={styles.searchContainer}>
-            <TextInput
-              placeholder="Search for properties..."
-              style={styles.searchBar}
-              value={searchTerm}
-              onChangeText={setSearchTerm}
-            />
-            <TouchableOpacity style={styles.locationButton} onPress={handleSearch}>
-              <Text style={styles.locationText}>Search</Text>
-              <Icon name="search" size={20} color="#000" />
-            </TouchableOpacity>
-          </View>
+              <View style={styles.searchContainer}>
+                <TextInput
+                  placeholder="Search for properties..."
+                  style={styles.searchBar}
+                  value={searchTerm}
+                  onChangeText={setSearchTerm}
+                />
+                {renderCityDropdown()}
+                <TouchableOpacity style={styles.locationButton} onPress={handleSearch}>
+                  <Icon name="search" size={20} color="#000" />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Category Grid */}
+            {loading ? (
+              <ActivityIndicator size="large" color="#008a43" />
+            ) : (
+              <>
+                <View style={styles.categoryContainer}>
+                  <FlatList
+                    data={propertyTypes}
+                    renderItem={renderCategoryItem}
+                    keyExtractor={(item) => item.id.toString()}
+                    numColumns={3}
+                    columnWrapperStyle={styles.categoryRow}
+                    contentContainerStyle={styles.categoryGrid}
+                  />
+                  {/* Property Listings */}
+                  <FlatList
+                    data={properties}
+                    renderItem={renderPropertyItem}
+                    keyExtractor={(item) => item.id.toString()}
+                    contentContainerStyle={styles.propertyList}
+                  />
+                </View>
+              </>
+            )}
+          </ScrollView>
+
+          {/* Floating Add Property Button */}
+          <TouchableOpacity
+            style={styles.floatingButton}
+            onPress={handleAddProperty}
+          >
+            <Text style={styles.floatingButtonText}>+</Text>
+          </TouchableOpacity>
         </View>
-
-        {/* Category Tabs */}
-        <View style={styles.tabsContainer}>
-          {Object.keys(categories).map((tab) => (
-            <TouchableOpacity
-              key={tab}
-              style={[styles.tab, selectedTab === tab && styles.activeTab]}
-              onPress={() => setSelectedTab(tab)}
-            >
-              <Text style={[styles.tabText, selectedTab === tab && styles.activeTabText]}>{tab}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Subcategory Grid */}
-        <FlatList
-          data={categories[selectedTab]}
-          renderItem={({ item }) => renderCategoryItem({ item, onPress: () => handleCategoryClick(item.name) })}
-          keyExtractor={(item) => item.id.toString()}
-          numColumns={3}
-          columnWrapperStyle={styles.categoryRow}
-          contentContainerStyle={styles.categoryGrid}
-        />
-
-        {/* Property Listings */}
-        {loading ? (
-          <ActivityIndicator size="large" color="#008a43" />
-        ) : (
-          <FlatList
-            data={properties}
-            renderItem={renderProperty}
-            keyExtractor={(item) => item.id.toString()}
-            contentContainerStyle={styles.propertyList}
-          />
-        )}
-      </ScrollView>
-
-      {/* Floating Add Property Button */}
-      <TouchableOpacity
-        style={styles.floatingButton}
-        onPress={() => navigation.navigate('PostAd')}
-      >
-        <Text style={styles.floatingButtonText}>+</Text>
-      </TouchableOpacity>
-    </View>
+      </AuthWrapper>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -260,6 +307,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 2,
+    position: 'relative', // Added thi
   },
   searchBar: {
     flex: 1,
@@ -276,47 +324,54 @@ const styles = StyleSheet.create({
     color: '#008a43',
     fontSize: 16,
   },
-  tabsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+  cityDropdownContainer: {
+    position: 'relative', // Ensures dropdown is correctly positioned
+  },
+  cityDropdown: {
+    position: 'absolute',
+    top: 40,  // Adjust top if needed based on button placement
+    left: 0,
+    width: 150,
     backgroundColor: '#fff',
-    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    zIndex: 9999,  // Keep this higher
+    elevation: 10, // For Android
+    maxHeight: 200,  // Add max height to control dropdown size if too many cities
+    overflow: 'scroll',  // Allow scrolling if the list is long
   },
-  tab: {
-    paddingVertical: 10,
-    borderBottomWidth: 2,
-    borderColor: '#f9f9f9',
-  },
-  activeTab: {
-    borderColor: '#008a43',
-  },
-  tabText: {
-    color: '#008a43',
-    fontWeight: 'bold',
-  },
-  activeTabText: {
-    color: '#008a43',
-    fontWeight: 'bold',
+  cityOption: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
   },
   categoryGrid: {
     paddingHorizontal: 15,
+    zIndex: 1,  // Ensure this has a lower zIndex than the city dropdown
   },
   categoryRow: {
     justifyContent: 'space-between',
     marginBottom: 10,
+    zIndex: 1,  // Ensure this has a lower zIndex than the city dropdown
   },
   categoryItem: {
     alignItems: 'center',
     justifyContent: 'center',
     flex: 1,
-    borderRadius: 15, // Rounded corners for category items
+    borderRadius: 15,
     padding: 10,
     backgroundColor: '#f7f7f7',
+    marginBottom: 15,
+    zIndex: 1,  // Lower zIndex for category items
   },
-  categoryName: {
-    fontSize: 14,
-    color: '#333',
-    marginTop: 5,
+  categoryIcon: {
+    width: 40,
+    height: 40,
+    marginBottom: 10,
+    resizeMode: 'contain',
+  },
+  textIcon: {
+    fontSize: 40,
     textAlign: 'center',
   },
   categoryCount: {

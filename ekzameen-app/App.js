@@ -1,9 +1,12 @@
 import 'react-native-gesture-handler';
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createDrawerNavigator, DrawerContentScrollView } from '@react-navigation/drawer';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // For storing and retrieving user tokens
+import Icon from 'react-native-vector-icons/MaterialIcons';  // Icon library
+
 import LoginScreen from './src/screens/LoginScreen';
 import SignUpScreen from './src/screens/SignUpScreen';
 import ForgotUsernameScreen from './src/screens/ForgotUsernameScreen';
@@ -11,11 +14,13 @@ import HomeScreen from './src/screens/HomeScreen';
 import PropertyDetailsScreen from './src/screens/PropertyDetailsScreen';
 import PostAdScreen from './src/screens/PostAdScreen';
 import PropertyTypesScreen from './src/screens/PropertyTypesScreen';
-import { enableScreens } from 'react-native-screens';
-import Icon from 'react-native-vector-icons/MaterialIcons';  // Icon library
-import SearchResultsScreen from './src/screens/SearchResultsScreen'; // Import the new screen
+import SearchResultsScreen from './src/screens/SearchResultsScreen';
+import { AuthProvider } from './src/data/context/AuthContext'; // Import AuthContext
+import { AuthContext } from './src/data/context/AuthContext'; // Import the AuthContext
+
 
 // Enable react-native-screens for better performance
+import { enableScreens } from 'react-native-screens';
 enableScreens();
 
 // Create Stack Navigator for individual screens
@@ -38,167 +43,223 @@ const MainStack = () => (
   </Stack.Navigator>
 );
 
-// Custom Drawer Content with back button and updated color scheme
-const CustomDrawerContent = (props) => (
-  <DrawerContentScrollView {...props}>
+// Custom Drawer Content with Sign Out button and user check
+const CustomDrawerContent = (props) => {
+  const { user, logoutUser } = useContext(AuthContext); // Get user and logout from context
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        // Check if user information is stored in AsyncStorage
+        const userData = await AsyncStorage.getItem('user');
+        if (userData) {
+          setUser(JSON.parse(userData));
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+    fetchUser();
+  }, []);
+
+  // Function to handle sign-out
+  const handleSignOut = async () => {
+    try {
+      // Clear access tokens and user data from AsyncStorage
+      await AsyncStorage.removeItem('accessToken');
+      await AsyncStorage.removeItem('refreshToken');
+      await AsyncStorage.removeItem('user');
+      // Redirect the user to the login screen
+      props.navigation.navigate('Login');
+      setUser(null); // Clear local state
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
+
+  return (
+    <DrawerContentScrollView {...props}>
     <View style={styles.drawerContent}>
-      {/* Back Button */}
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => props.navigation.closeDrawer()} // Close the drawer when pressed
-      >
-        <Icon name="arrow-back" size={24} color="#fff" />
-        <Text style={styles.drawerText}>Back</Text>
-      </TouchableOpacity>
+      {/* Header with Logo */}
+      <View style={styles.drawerHeader}>
+        <Image
+          source={{ uri: 'https://ekzameen.com/images/vertical_full_white.png' }}
+          style={styles.drawerLogo}
+        />
+      </View>
 
-      {/* Buy/Rent Option */}
-      <TouchableOpacity style={styles.drawerItem}>
+      {/* User Info or Login Button */}
+      {!user ? (
+        <TouchableOpacity
+          style={styles.loginButton}
+          onPress={() => props.navigation.navigate('Login')}
+        >
+          <Text style={styles.loginButtonText}>Login or Create Account</Text>
+        </TouchableOpacity>
+      ) : (
+        <View style={styles.userInfo}>
+          <Text style={styles.userName}>{`${user.firstName} ${user.lastName}`}</Text>
+          <Text style={styles.userPhone}>{user.phone}</Text>
+        </View>
+      )}
+
+      {/* Drawer Items */}
+      <TouchableOpacity style={styles.drawerItem} onPress={() => props.navigation.navigate('Home')}>
         <Icon name="home" size={24} color="#fff" />
-        <Text style={styles.drawerText}>Buy/Rent</Text>
+        <Text style={styles.drawerText}>Home</Text>
       </TouchableOpacity>
 
-      {/* Property Type */}
-      <TouchableOpacity style={styles.drawerItem}>
-        <Icon name="apartment" size={24} color="#fff" />
-        <Text style={styles.drawerText}>Type</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.drawerItem} onPress={() => props.navigation.navigate('PostAd')}>
+          <Icon name="add-circle-outline" size={24} color="#fff" />
+          <Text style={styles.drawerText}>Add Property</Text>
+        </TouchableOpacity>
 
-      {/* City */}
-      <TouchableOpacity style={styles.drawerItem}>
-        <Icon name="location-city" size={24} color="#fff" />
-        <Text style={styles.drawerText}>City</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.drawerItem} onPress={() => props.navigation.navigate('SearchResults')}>
+          <Icon name="search" size={24} color="#fff" />
+          <Text style={styles.drawerText}>Search Properties</Text>
+        </TouchableOpacity>
 
-      {/* Location */}
-      <TouchableOpacity style={styles.drawerItem}>
-        <Icon name="place" size={24} color="#fff" />
-        <Text style={styles.drawerText}>Location</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.drawerItem}>
+          <Icon name="new-releases" size={24} color="#fff" />
+          <Text style={styles.drawerText}>New Projects</Text>
+        </TouchableOpacity>
 
-      {/* Price */}
-      <TouchableOpacity style={styles.drawerItem}>
-        <Icon name="attach-money" size={24} color="#fff" />
-        <Text style={styles.drawerText}>Price</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.drawerItem}>
+          <Icon name="favorite" size={24} color="#fff" />
+          <Text style={styles.drawerText}>Favorites</Text>
+        </TouchableOpacity>
 
-      {/* Beds */}
-      <TouchableOpacity style={styles.drawerItem}>
-        <Icon name="bed" size={24} color="#fff" />
-        <Text style={styles.drawerText}>Beds</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.drawerItem}>
+          <Icon name="bookmark" size={24} color="#fff" />
+          <Text style={styles.drawerText}>Saved Searches</Text>
+        </TouchableOpacity>
 
-      {/* Area */}
-      <TouchableOpacity style={styles.drawerItem}>
-        <Icon name="square-foot" size={24} color="#fff" />
-        <Text style={styles.drawerText}>Area</Text>
-      </TouchableOpacity>
-    </View>
+        {/* Language & About Us Section */}
+        <View style={styles.appControls}>
+          <TouchableOpacity style={styles.drawerItem}>
+            <Icon name="language" size={24} color="#fff" />
+            <Text style={styles.drawerText}>اردو</Text>
+          </TouchableOpacity>
 
-    {/* Bottom Buttons */}
-    <View style={styles.bottomButtons}>
-      <TouchableOpacity style={styles.resetButton}>
-        <Text style={styles.resetText}>Reset Fields</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.searchButton}>
-        <Text style={styles.searchText}>Search</Text>
-      </TouchableOpacity>
-    </View>
-  </DrawerContentScrollView>
-);
+          <TouchableOpacity style={styles.drawerItem}>
+            <Icon name="info" size={24} color="#fff" />
+            <Text style={styles.drawerText}>About Us</Text>
+          </TouchableOpacity>
+        </View>
 
+        {/* Sign Out Button at the bottom */}
+        {user && (
+          <TouchableOpacity style={styles.signOutButton} onPress={logoutUser}>
+            <Icon name="logout" size={24} color="#fff" />
+            <Text style={styles.drawerText}>Sign Out</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    </DrawerContentScrollView>
+  );
+};
 
 // Create Drawer Navigator (Sidebar)
 const Drawer = createDrawerNavigator();
 
 const App = () => {
   return (
-    <NavigationContainer>
-      <Drawer.Navigator
-        initialRouteName="Dashboard"
-        drawerContent={(props) => <CustomDrawerContent {...props} />}
-        screenOptions={{
-          headerStyle: { backgroundColor: '#fff' },  // Green color for header background
-          headerTitle: () => (
-            <Image
-              source={{ uri: 'https://ekzameen.com/images/vertical_full.png' }}  // Logo URL
-              style={styles.logo}
-            />
-          ),
-        }}
-      >
-        <Drawer.Screen name="Dashboard" component={MainStack} />
-      </Drawer.Navigator>
-    </NavigationContainer>
+    <AuthProvider>
+      <NavigationContainer>
+        <Drawer.Navigator
+          initialRouteName="Dashboard"
+          drawerContent={(props) => <CustomDrawerContent {...props} />}
+          screenOptions={{
+            headerStyle: { backgroundColor: '#008a43' },  // Green theme color for header
+            headerTitle: () => (
+              <Image
+                source={{ uri: 'https://ekzameen.com/images/vertical_full_white.png' }}  // Green theme logo URL
+                style={styles.logo}
+              />
+            ),
+            headerTintColor: '#fff',  // Text and icons color set to white
+          }}
+        >
+          <Drawer.Screen name="Dashboard" component={MainStack} />
+        </Drawer.Navigator>
+      </NavigationContainer>
+    </AuthProvider>
   );
 };
 
 export default App;
 
-// Styles for the drawer
+// Styles for the drawer and header
 const styles = StyleSheet.create({
   drawerContent: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#008a43',  // Updated color to #008a43
+    backgroundColor: '#008a43',  // Green theme for drawer background
   },
-  backButton: {
-    flexDirection: 'row',
+  drawerHeader: {
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 30,
+  },
+  drawerLogo: {
+    width: 150,
+    height: 50,
+    resizeMode: 'contain',
+  },
+  userInfo: {
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  userName: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  userPhone: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  loginButton: {
+    marginTop: 10,
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    backgroundColor: '#fff',
+    borderColor: '#008a43',
+    borderWidth: 1,
+    borderRadius: 5,
+  },
+  loginButtonText: {
+    color: '#008a43',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   drawerItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+    paddingVertical: 15,
   },
   drawerText: {
     fontSize: 18,
     marginLeft: 15,
-    color: '#fff',  // Text color white to contrast the green background
+    color: '#fff',  // White text color for drawer items
   },
-  bottomButtons: {
-    marginTop: 'auto',
-    padding: 20,
-    backgroundColor: '#fff',
-  },
-  resetButton: {
-    backgroundColor: '#ccc',
-    padding: 10,
-    borderRadius: 5,
+  signOutButton: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    paddingVertical: 15,
+    marginTop: 'auto', // Align to bottom
+    borderTopWidth: 1,
+    borderTopColor: '#ccc',
   },
-  searchButton: {
-    backgroundColor: '#ffc107',  // Background color updated to #ffc107
-    padding: 10,
-    borderRadius: 5,
-    alignItems: 'center',
-  },
-  searchText: {
-    color: '#000',  // Text color updated to #000
-    fontSize: 16,
-  },
-  floatingButton: {
-    backgroundColor: '#ffc107',  // Floating button background color updated to #ffc107
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    position: 'absolute',
-    bottom: 20,
-    right: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  floatingButtonText: {
-    color: '#000',  // Floating button text color updated to #000
-    fontSize: 24,
-    fontWeight: 'bold',
+  appControls: {
+    marginTop: 20,
+    paddingTop: 20,
+    borderTopWidth: 1,
+    borderTopColor: '#ccc',
   },
   logo: {
-    width: 150,  // Adjust width based on the logo size
-    height: 40,  // Adjust height based on the logo size
+    width: 180,
+    alignContent: 'center',
+    height: 40,
     resizeMode: 'contain',
   },
 });
-
-

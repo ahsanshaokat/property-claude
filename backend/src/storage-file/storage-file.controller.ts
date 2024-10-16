@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {
   Controller,
   Get,
@@ -32,6 +33,14 @@ export class StorageFileController {
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
+        // destination: './public/uploads/floor_plan',
+        // destination: (req: Request, file: Express.Multer.File, cb: any) => {
+        //   const destinationPath = `./public/uploads/${req.body.type}`;
+        //   if (!fs.existsSync(destinationPath)) {
+        //     fs.mkdirSync(destinationPath, { recursive: true });
+        //   }
+        //   cb(null, `${destinationPath}`);
+        // },
         filename: (req: Request, file: Express.Multer.File, cb: any) => {
           const randomName = uuidv4();
           const fileName = `${Date.now()}time${randomName
@@ -43,9 +52,11 @@ export class StorageFileController {
     }),
   )
   create(
-    @Body() createStorageFileDto: CreateStorageFileDto, // <-- this will handle non-file fields (like type)
-    @UploadedFile() file: Express.Multer.File, // <-- this will handle the file upload
+    @Body() createStorageFileDto: CreateStorageFileDto,
+    @UploadedFile() file: Express.Multer.File,
   ) {
+
+    console.log("===file===", file)
     return this.storageFileService.create(createStorageFileDto, file);
   }
 

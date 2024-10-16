@@ -1,19 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image, ActivityIndicator, Linking, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';  // For icons
-import { getProperties } from '../data/api/propertyApi';  // API function to get properties
 import moment from 'moment';  // For time formatting
+import { getPropertiesByFilter } from '../data/api/propertyApi';  // Updated API function to get properties by filter
+import Communications from 'react-native-communications';  // To handle SMS, Call, etc.
 
 const SearchResultsScreen = ({ navigation, route }) => {
+  const { propertyType, cityId, purpose } = route.params;  // Directly extract propertyType and cityId from route.params
+  
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedFilters, setSelectedFilters] = useState('5 Marla');  // Example of a selected filter
 
   useEffect(() => {
     const fetchProperties = async () => {
       try {
-        // Fetch properties with filters passed from route or default filters
-        const response = await getProperties('?page=1&perPage=12&order[updated_at]=DESC&filters[propertySize]=5');
+        const filterObject = {
+          basic: {
+            page: 1,
+            perPage: 12,
+          },
+          filters: {
+            propertyType,  // Pass propertyType dynamically
+            cityId,        // Pass cityId dynamically
+            purpose,       // Pass purpose dynamically
+          },
+        };
+
+        const response = await getPropertiesByFilter(filterObject);
         if (response.data.success) {
           setProperties(response.data.data);
         }
@@ -25,7 +38,24 @@ const SearchResultsScreen = ({ navigation, route }) => {
     };
 
     fetchProperties();
-  }, []);
+  }, [propertyType, cityId, purpose]);  // Re-fetch when propertyType, cityId, or purpose changes
+
+  // Handle Call
+  const handleCall = (phoneNumber) => {
+    const url = `tel:${phoneNumber}`;
+    Linking.openURL(url).catch(err => Alert.alert('Error', 'Failed to make a call.'));
+  };
+
+  // Handle SMS
+  const handleSMS = (phoneNumber) => {
+    Communications.text(phoneNumber, 'Hello, I am interested in this property.');
+  };
+
+  // Handle WhatsApp
+  const handleWhatsApp = (phoneNumber) => {
+    const whatsappURL = `whatsapp://send?phone=${phoneNumber}&text=Hello, I am interested in this property.`;
+    Linking.openURL(whatsappURL).catch(() => Alert.alert('Error', 'WhatsApp is not installed on your device.'));
+  };
 
   const renderProperty = ({ item }) => (
     <TouchableOpacity onPress={() => navigation.navigate('PropertyDetails', { propertyId: item.id })}>
@@ -55,13 +85,13 @@ const SearchResultsScreen = ({ navigation, route }) => {
 
           {/* Action Buttons (SMS, Call, WhatsApp) */}
           <View style={styles.actionButtons}>
-            <TouchableOpacity style={styles.button} onPress={() => alert(`Sending SMS to ${item.additionalSpec}`)}>
+            <TouchableOpacity style={styles.button} onPress={() => handleSMS(item.additionalSpec)}>
               <Text style={styles.buttonText}>SMS</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={() => alert(`Calling ${item.additionalSpec}`)}>
+            <TouchableOpacity style={styles.button} onPress={() => handleCall(item.additionalSpec)}>
               <Text style={styles.buttonText}>Call</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={() => alert(`Opening WhatsApp to ${item.additionalSpec}`)}>
+            <TouchableOpacity style={styles.button} onPress={() => handleWhatsApp(item.additionalSpec)}>
               <Text style={styles.buttonText}>WhatsApp</Text>
             </TouchableOpacity>
           </View>
@@ -86,11 +116,6 @@ const SearchResultsScreen = ({ navigation, route }) => {
         <TouchableOpacity style={styles.filterButton}>
           <Text style={styles.filterText}>Price Range</Text>
         </TouchableOpacity>
-        {selectedFilters && (
-          <TouchableOpacity style={styles.clearButton} onPress={() => setSelectedFilters(null)}>
-            <Text style={styles.clearText}>Clear All</Text>
-          </TouchableOpacity>
-        )}
       </View>
 
       {/* Properties List */}
@@ -128,12 +153,6 @@ const styles = StyleSheet.create({
   filterText: {
     fontSize: 14,
     color: '#333',
-  },
-  clearButton: {
-    padding: 10,
-  },
-  clearText: {
-    color: '#ff0000',
   },
   propertyList: {
     paddingBottom: 20,
