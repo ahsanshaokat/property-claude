@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, Text, Platform } from 'react-native';
-import WebView from 'react-native-webview';
+import { View, Text, Platform, Linking } from 'react-native';
 
 const WebViewScreen = () => {
   useEffect(() => {
