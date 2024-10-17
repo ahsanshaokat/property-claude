@@ -1,19 +1,17 @@
 /* eslint-disable react/prop-types */
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, ScrollView, Switch, Picker, ActivityIndicator, CheckBox, Alert } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, ScrollView, Picker, ActivityIndicator, Alert } from 'react-native';
 import { getPropertyTypes, getCities, getFeatures, createProperty, uploadImage } from '../data/api/propertyApi'; // Assuming these are defined
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
 
 const PostAdScreen = ({ navigation }) => {
-  const [purpose, setPurpose] = useState('SALE'); // Toggle between Sell and Rent
-  const [propertyType, setPropertyType] = useState(''); // Property Type
-  const [city, setCity] = useState(''); // City
+  const [purpose, setPurpose] = useState('SALE');
+  const [propertyType, setPropertyType] = useState('');
+  const [city, setCity] = useState('');
   const [propertySize, setPropertySize] = useState('');
   const [price, setPrice] = useState('');
-  const [installments, setInstallments] = useState(false); // Installments
-  const [possessionReady, setPossessionReady] = useState(false); // Possession
-  const [bedrooms, setBedrooms] = useState(1); // Number of Bedrooms
-  const [bathrooms, setBathrooms] = useState(1); // Number of Bathrooms
+  const [bedrooms, setBedrooms] = useState(1);
+  const [bathrooms, setBathrooms] = useState(1);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [contactNumber, setContactNumber] = useState('');
@@ -22,10 +20,10 @@ const PostAdScreen = ({ navigation }) => {
   const [yearBuild, setYearBuild] = useState('');
   const [propertyTypes, setPropertyTypes] = useState([]);
   const [cities, setCities] = useState([]);
-  const [features, setFeatures] = useState([]); // Features state
-  const [selectedFeatures, setSelectedFeatures] = useState([]); // Selected features
-  const [imageFiles, setImageFiles] = useState([]); // Uploaded images
-  const [imageType, setImageType] = useState(''); // Image type (Feature/Header)
+  const [features, setFeatures] = useState([]);
+  const [selectedFeatures, setSelectedFeatures] = useState([]);
+  const [imageFiles, setImageFiles] = useState([]);
+  const [imageType, setImageType] = useState('');
   const [loading, setLoading] = useState(false);
 
   // Fetch property types, cities, and features on mount
@@ -82,23 +80,21 @@ const PostAdScreen = ({ navigation }) => {
       return;
     }
 
-    const selectedFile = files[0]; // Get the selected file
-    const fileName = selectedFile.name; // Extract the file name
+    const selectedFile = files[0];
+    const fileName = selectedFile.name;
 
-    // Prepare FormData for upload
     let formData = new FormData();
     formData.append('type', imageType);
     formData.append('size', 'md');
-    formData.append('fileName', fileName); // Add the file name to FormData
-    formData.append('file', selectedFile); // Add the file as binary data
+    formData.append('fileName', fileName);
+    formData.append('file', selectedFile);
 
     setLoading(true);
 
-    // API call to upload the image
     uploadImage(formData)
       .then((res) => {
         setLoading(false);
-        setImageFiles([...imageFiles, res.data]); // Save the uploaded file details
+        setImageFiles([...imageFiles, res.data]);
         Alert.alert('Image uploaded successfully');
       })
       .catch((error) => {
@@ -107,40 +103,38 @@ const PostAdScreen = ({ navigation }) => {
         Alert.alert('Image upload failed');
       });
 
-    // Reset the file input field
     target.value = '';
   };
   
   const handlePostAd = async () => {
     const adData = {
       purpose,
-      propertyType: parseInt(propertyType), // Convert to integer
-      city: parseInt(city), // Convert to integer
-      propertySize: parseInt(propertySize), // Convert to integer
-      price: parseInt(price), // Convert to integer
-      noOfBathRoom: parseInt(bathrooms), // Convert to integer
-      noOfBedRoom: parseInt(bedrooms), // Convert to integer
+      propertyType: parseInt(propertyType),
+      city: parseInt(city),
+      propertySize: parseInt(propertySize),
+      price: parseInt(price),
+      noOfBathRoom: parseInt(bathrooms),
+      noOfBedRoom: parseInt(bedrooms),
       name: title,
       descriptions: description,
       additionalSpec: contactNumber,
       address,
-      totalFloors: parseInt(totalFloors), // Convert to integer
-      yearBuild: parseInt(yearBuild), // Convert to integer
-      features: selectedFeatures, // Add selected features to the payload
-      propertyImages: imageFiles.map(file => file.id), // Pass only the image IDs
+      totalFloors: parseInt(totalFloors),
+      yearBuild: parseInt(yearBuild),
+      features: selectedFeatures,
+      propertyImages: imageFiles.map(file => file.id),
       lat: null,
       long: null,
     };
     
     try {
-      // Fetch the accessToken from AsyncStorage
       const accessToken = await AsyncStorage.getItem('accessToken');
 
       if (!accessToken) {
         Alert.alert('Error', 'User not authenticated');
         return;
       }
-      await createProperty(adData, accessToken); // Pass the access token to the API
+      await createProperty(adData, accessToken);
       Alert.alert('Ad posted successfully!');
       navigation.goBack();
     } catch (error) {
@@ -200,8 +194,30 @@ const PostAdScreen = ({ navigation }) => {
               ))}
             </Picker>
           </View>
-          
-          {/* Other fields */}
+
+          {/* Title and Description */}
+          <View style={styles.section}>
+            <Text style={styles.sectionHeader}>Property Title</Text>
+            <TextInput 
+              style={styles.input}
+              value={title}
+              onChangeText={setTitle}
+              placeholder="Enter property title" 
+            />
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionHeader}>Property Description</Text>
+            <TextInput 
+              style={styles.input}
+              value={description}
+              onChangeText={setDescription}
+              placeholder="Enter property description" 
+              multiline
+            />
+          </View>
+
+          {/* Area Size, Price, Bedrooms, Bathrooms, Address, Total Floors, Year Built */}
           <View style={styles.section}>
             <Text style={styles.sectionHeader}>Area Size (Sq. Ft.)</Text>
             <TextInput 
@@ -221,22 +237,6 @@ const PostAdScreen = ({ navigation }) => {
               onChangeText={setPrice}
               placeholder="Enter price" 
               keyboardType="numeric"
-            />
-          </View>
-
-          <View style={styles.section}>
-            <Text style={styles.sectionHeader}>Installments Available</Text>
-            <Switch
-              value={installments}
-              onValueChange={setInstallments}
-            />
-          </View>
-
-          <View style={styles.section}>
-            <Text style={styles.sectionHeader}>Ready for Possession</Text>
-            <Switch
-              value={possessionReady}
-              onValueChange={setPossessionReady}
             />
           </View>
 
@@ -263,27 +263,6 @@ const PostAdScreen = ({ navigation }) => {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionHeader}>Property Title</Text>
-            <TextInput 
-              style={styles.input}
-              value={title}
-              onChangeText={setTitle}
-              placeholder="Enter property title" 
-            />
-          </View>
-
-          <View style={styles.section}>
-            <Text style={styles.sectionHeader}>Property Description</Text>
-            <TextInput 
-              style={styles.input}
-              value={description}
-              onChangeText={setDescription}
-              placeholder="Enter property description" 
-              multiline
-            />
-          </View>
-
-          <View style={styles.section}>
             <Text style={styles.sectionHeader}>Address</Text>
             <TextInput 
               style={styles.input}
@@ -294,12 +273,12 @@ const PostAdScreen = ({ navigation }) => {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionHeader}>Year Build</Text>
+            <Text style={styles.sectionHeader}>Year Built</Text>
             <TextInput 
               style={styles.input}
               value={yearBuild.toString()}
               onChangeText={setYearBuild}
-              placeholder="Enter year build" 
+              placeholder="Enter year built" 
               keyboardType="numeric"
             />
           </View>
@@ -329,22 +308,32 @@ const PostAdScreen = ({ navigation }) => {
           {/* Features */}
           <View style={styles.section}>
             <Text style={styles.sectionHeader}>Features</Text>
-            {features.map((feature) => (
-              <View key={feature.id} style={styles.featureContainer}>
-                <CheckBox
-                  value={selectedFeatures.includes(feature.id)}
-                  onValueChange={() => toggleFeature(feature.id)}
-                />
-                <Text>{feature.name}</Text>
-              </View>
-            ))}
+            <View style={styles.featureButtonContainer}>
+              {features.map((feature) => (
+                <TouchableOpacity
+                  key={feature.id}
+                  style={[
+                    styles.featureButton,
+                    selectedFeatures.includes(feature.id) && styles.selectedFeatureButton
+                  ]}
+                  onPress={() => toggleFeature(feature.id)}
+                >
+                  <Text
+                    style={[
+                      styles.featureText,
+                      selectedFeatures.includes(feature.id) && styles.selectedFeatureText
+                    ]}
+                  >
+                    {feature.name}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
           </View>
 
           {/* Image Upload */}
           <View style={styles.section}>
             <Text style={styles.sectionHeader}>Upload Images</Text>
-
-            {/* Image Type Selector */}
             <View style={styles.toggleRow}>
               <TouchableOpacity
                 style={[styles.toggleButton, imageType === 'feature' && styles.activeButton]}
@@ -435,10 +424,25 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     borderRadius: 8,
   },
-  featureContainer: {
+  featureButtonContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
+    flexWrap: 'wrap',
+  },
+  featureButton: {
+    padding: 10,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    margin: 5,
+  },
+  selectedFeatureButton: {
+    backgroundColor: '#008a43',
+  },
+  featureText: {
+    color: '#000',
+  },
+  selectedFeatureText: {
+    color: '#fff',
   },
   uploadedImages: {
     marginTop: 20,
