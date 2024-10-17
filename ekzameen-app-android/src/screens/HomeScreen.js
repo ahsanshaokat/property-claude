@@ -16,6 +16,50 @@ const HomeScreen = ({ navigation }) => {
   const [cityDropdownOpen, setCityDropdownOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  
+  // Function to make a phone call
+  const handleCall = (phoneNumber) => {
+    const phoneUrl = `tel:${phoneNumber}`;
+    Linking.canOpenURL(phoneUrl)
+      .then((supported) => {
+        if (!supported) {
+          Alert.alert('Error', `Can't handle phone call`);
+        } else {
+          return Linking.openURL(phoneUrl);
+        }
+      })
+      .catch((err) => console.error('An error occurred', err));
+  };
+
+  // Function to send an SMS
+  const handleSMS = (phoneNumber) => {
+    const smsUrl = `sms:${phoneNumber}`;
+    Linking.canOpenURL(smsUrl)
+      .then((supported) => {
+        if (!supported) {
+          Alert.alert('Error', `Can't handle SMS`);
+        } else {
+          return Linking.openURL(smsUrl);
+        }
+      })
+      .catch((err) => console.error('An error occurred', err));
+  };
+
+  // Function to open WhatsApp
+  const handleWhatsApp = (phoneNumber) => {
+    const whatsappUrl = `whatsapp://send?phone=${phoneNumber}`;
+    Linking.canOpenURL(whatsappUrl)
+      .then((supported) => {
+        if (!supported) {
+          Alert.alert('Error', `WhatsApp is not installed on this device`);
+        } else {
+          return Linking.openURL(whatsappUrl);
+        }
+      })
+      .catch((err) => console.error('An error occurred', err));
+  };
+
+
   // Function to fetch properties, property types, and cities
   const fetchData = async () => {
     setLoading(true);
@@ -160,13 +204,13 @@ const HomeScreen = ({ navigation }) => {
 
           {/* Buttons for Call, SMS, and WhatsApp */}
           <View style={styles.contactButtons}>
-            <TouchableOpacity style={styles.contactButton} onPress={() => alert(`Opening WhatsApp for ${item.additionalSpec}`)}>
+            <TouchableOpacity style={styles.contactButton} onPress={() => handleWhatsApp(item.additionalSpec)}>
               <FontAwesome  name="whatsapp" size={20} color="#fff" />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.contactButton} onPress={() => alert(`Sending SMS to ${item.additionalSpec}`)}>
+            <TouchableOpacity style={styles.contactButton} onPress={() => handleSMS(item.additionalSpec)}>
               <Icon name="sms" size={20} color="#fff" />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.contactButton} onPress={() => alert(`Calling ${item.additionalSpec}`)}>
+            <TouchableOpacity style={styles.contactButton} onPress={() => handleCall(item.additionalSpec)}>
               <Icon name="phone" size={20} color="#fff" />
               <Text style={styles.contactButtonText}>Call</Text>
             </TouchableOpacity>

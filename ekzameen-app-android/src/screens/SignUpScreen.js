@@ -145,7 +145,7 @@ const SignUpScreen = ({ navigation }) => {
       {errors.password && <Text style={styles.errorText}>{errors.password.message}</Text>}
 
       <TouchableOpacity style={styles.submitButton} onPress={handleSubmit(onSubmit)}>
-        <Text style={styles.submitButtonText}>Submit</Text>
+        <Text style={styles.submitButtonText}>Register</Text>
       </TouchableOpacity>
     </View>
   );
