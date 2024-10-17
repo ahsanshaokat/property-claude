@@ -117,7 +117,7 @@ const CustomDrawerContent = (props) => {
           <Text style={styles.drawerText}>Add Property</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.drawerItem} onPress={() => props.navigation.navigate('SearchResults')}>
+        {/* <TouchableOpacity style={styles.drawerItem} onPress={() => props.navigation.navigate('SearchResults')}>
           <Icon name="search" size={24} color="#fff" />
           <Text style={styles.drawerText}>Search Properties</Text>
         </TouchableOpacity>
@@ -135,7 +135,7 @@ const CustomDrawerContent = (props) => {
         <TouchableOpacity style={styles.drawerItem}>
           <Icon name="bookmark" size={24} color="#fff" />
           <Text style={styles.drawerText}>Saved Searches</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         {/* Language & About Us Section */}
         <View style={styles.appControls}>

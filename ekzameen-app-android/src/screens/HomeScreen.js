@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, FlatList, StyleSheet, TextInput, Image, TouchableOpacity, ScrollView, ActivityIndicator, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TextInput, Image, TouchableOpacity, ScrollView, ActivityIndicator, TouchableWithoutFeedback, Linking, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons'; // For icons
 import { getProperties, getPropertyTypes, getCities } from '../data/api/propertyApi'; // Import the functions
 import { useFocusEffect } from '@react-navigation/native'; // To refetch data on focus
+import FontAwesome from 'react-native-vector-icons/FontAwesome'; // Import FontAwesome
+
 
 const HomeScreen = ({ navigation }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -64,6 +66,30 @@ const HomeScreen = ({ navigation }) => {
     if (cityDropdownOpen) {
       setCityDropdownOpen(false);
     }
+  };
+
+  // Function to call the property contact number
+  const makeCall = (number) => {
+    Linking.openURL(`tel:${number}`);
+  };
+
+  // Function to send SMS
+  const sendSMS = (number) => {
+    Linking.openURL(`sms:${number}`);
+  };
+
+  // Function to open WhatsApp
+  const openWhatsApp = (number) => {
+    const url = `whatsapp://send?phone=${number}`;
+    Linking.canOpenURL(url)
+      .then((supported) => {
+        if (!supported) {
+          Alert.alert("Error", "WhatsApp is not installed on this device.");
+        } else {
+          return Linking.openURL(url);
+        }
+      })
+      .catch((err) => console.error("Error opening WhatsApp: ", err));
   };
 
   // Render category item
@@ -131,6 +157,20 @@ const HomeScreen = ({ navigation }) => {
             </View>
           </View>
           <Text style={styles.propertyPrice}>Rs. {item.price}</Text>
+
+          {/* Buttons for Call, SMS, and WhatsApp */}
+          <View style={styles.contactButtons}>
+            <TouchableOpacity style={styles.contactButton} onPress={() => alert(`Opening WhatsApp for ${item.additionalSpec}`)}>
+              <FontAwesome  name="whatsapp" size={20} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.contactButton} onPress={() => alert(`Sending SMS to ${item.additionalSpec}`)}>
+              <Icon name="sms" size={20} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.contactButton} onPress={() => alert(`Calling ${item.additionalSpec}`)}>
+              <Icon name="phone" size={20} color="#fff" />
+              <Text style={styles.contactButtonText}>Call</Text>
+            </TouchableOpacity>
+        </View>
         </View>
       </View>
     </TouchableOpacity>
@@ -170,7 +210,7 @@ const HomeScreen = ({ navigation }) => {
                   onChangeText={setSearchTerm}
                 />
                 {renderCityDropdown()}
-                <TouchableOpacity style={styles.locationButton} onPress={handleSearch}>
+                <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
                   <Icon name="search" size={20} color="#000" />
                 </TouchableOpacity>
               </View>
@@ -296,12 +336,17 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     width: '90%',
     elevation: 2,
-    position: 'relative', // Added thi
+    position: 'relative',
   },
   searchBar: {
     flex: 1,
     paddingVertical: 8,
     fontSize: 16,
+  },
+  searchButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10, // Adjust padding for better spacing
   },
   locationButton: {
     flexDirection: 'row',
@@ -314,20 +359,20 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   cityDropdownContainer: {
-    position: 'relative', // Ensures dropdown is correctly positioned
+    position: 'relative',
   },
   cityDropdown: {
     position: 'absolute',
-    top: 40,  // Adjust top if needed based on button placement
+    top: 40,
     left: 0,
     width: 150,
     backgroundColor: '#fff',
     borderWidth: 1,
     borderColor: '#ccc',
-    zIndex: 9999,  // Keep this higher
-    elevation: 10, // For Android
-    maxHeight: 200,  // Add max height to control dropdown size if too many cities
-    overflow: 'scroll',  // Allow scrolling if the list is long
+    zIndex: 9999,
+    elevation: 10,
+    maxHeight: 200,
+    overflow: 'scroll',
   },
   cityOption: {
     padding: 10,
@@ -336,12 +381,12 @@ const styles = StyleSheet.create({
   },
   categoryGrid: {
     paddingHorizontal: 15,
-    zIndex: -33,  // Ensure this has a lower zIndex than the city dropdown
+    zIndex: -33,
   },
   categoryRow: {
     justifyContent: 'space-between',
     marginBottom: 10,
-    zIndex: -4,  // Ensure this has a lower zIndex than the city dropdown
+    zIndex: -4,
   },
   categoryItem: {
     alignItems: 'center',
@@ -351,13 +396,13 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: '#f7f7f7',
     marginBottom: 15,
-    zIndex: -1,  // Lower zIndex for category items
+    zIndex: -1,
   },
   categoryIcon: {
     width: 40,
     height: 40,
     marginBottom: 10,
-    zIndex: -1,  // Lower zIndex for category items
+    zIndex: -1,
     resizeMode: 'contain',
   },
   textIcon: {
@@ -373,7 +418,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginLeft: 15,
-    marginTop: 10,
+    marginTop: 15,
   },
   propertyList: { padding: 10 },
   propertyCard: {
@@ -383,7 +428,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 10,
     elevation: 2,
-    position: 'relative', // For fixed tag position
+    position: 'relative',
   },
   propertyTag: {
     backgroundColor: '#008a43',
@@ -391,8 +436,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
     paddingVertical: 2,
     position: 'absolute',
-    left: -15, // Position to the left outside the card
-    top: 10,
+    left: -15,
+    top: -5,
     width: 50,
   },
   saleTag: {
@@ -439,6 +484,30 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#000',
+  },
+  contactButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center', // Aligns icons and text properly
+    marginTop: 10,
+    paddingHorizontal: 5, 
+    width: '100%', 
+  },
+  contactButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#008a43',
+    paddingVertical: 10, // Increase padding for better button height
+    borderRadius: 5,
+    justifyContent: 'center',
+    flex: 1,
+    marginHorizontal: 5, // Adds space between buttons
+  },
+  contactButtonText: {
+    color: '#fff',
+    marginLeft: 5,
+    fontWeight: 'bold',
+    fontSize: 14,
   },
 });
 
