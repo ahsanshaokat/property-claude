@@ -220,6 +220,7 @@ const HomeScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  categoryContainer: {zIndex: -1},
   container: { flex: 1, backgroundColor: '#f2f2f2', zIndex: -1 },
   scrollContainer: { paddingBottom: 100 },
   floatingButton: {
