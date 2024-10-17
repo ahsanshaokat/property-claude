@@ -15,6 +15,10 @@ const HomeScreen = ({ navigation }) => {
   const [selectedCity, setSelectedCity] = useState({ id: 14, name: 'Lahore' });
   const [cityDropdownOpen, setCityDropdownOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1); // Pagination page
+const [loadingMore, setLoadingMore] = useState(false); // For pagination loading
+const [refreshing, setRefreshing] = useState(false); // For pull-to-refresh
+const [hasMoreData, setHasMoreData] = useState(true); // To track if more data is available
 
   
   // Function to make a phone call
@@ -61,22 +65,27 @@ const HomeScreen = ({ navigation }) => {
 
 
   // Function to fetch properties, property types, and cities
-  const fetchData = async () => {
-    setLoading(true);
+  const fetchData = async (pageNumber = 1, isRefreshing = false) => {
+    if (!isRefreshing) {
+      setLoading(true);
+    }
     try {
-      const propertyResponse = await getProperties("?page=1&perPage=12&order[updated_at]=DESC");
-      const typesResponse = await getPropertyTypes();
-      const citiesResponse = await getCities();
-
-      if (propertyResponse.data.success && typesResponse && citiesResponse) {
-        setProperties(propertyResponse.data.data); // Set properties list
-        setPropertyTypes(typesResponse.data); // Set property types
-        setCities(citiesResponse.data); // Set cities list
+      const propertyResponse = await getProperties(`?page=${pageNumber}&perPage=12&order[updated_at]=DESC`);
+      
+      if (propertyResponse.data.success) {
+        if (pageNumber === 1) {
+          setProperties(propertyResponse.data.data); // Reset properties list on new fetch or refresh
+        } else {
+          setProperties((prevProperties) => [...prevProperties, ...propertyResponse.data.data]); // Append for pagination
+        }
+        setHasMoreData(propertyResponse.data.data.length > 0); // Check if more data is available
       }
     } catch (error) {
       console.error("Error fetching data: ", error);
     } finally {
       setLoading(false);
+      setLoadingMore(false);
+      setRefreshing(false);
     }
   };
 
@@ -98,6 +107,15 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
+  const loadMoreData = async () => {
+    if (!loadingMore && hasMoreData) {
+      setLoadingMore(true);
+      const nextPage = page + 1;
+      setPage(nextPage);
+      await fetchData(nextPage); // Fetch more data for the next page
+    }
+  };
+  
   // Function to handle category click
   const handleCategoryClick = (alias) => {
     navigation.navigate('SearchResults', { 
@@ -120,6 +138,12 @@ const HomeScreen = ({ navigation }) => {
   // Function to send SMS
   const sendSMS = (number) => {
     Linking.openURL(`sms:${number}`);
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    setPage(1); // Reset page to 1 for refreshing
+    await fetchData(1, true); // Fetch fresh data
   };
 
   // Function to open WhatsApp
@@ -286,11 +310,16 @@ const HomeScreen = ({ navigation }) => {
             ) : (
               <>
                 <FlatList
-                  data={properties}
-                  renderItem={renderPropertyItem}
-                  keyExtractor={(item) => item.id.toString()}
-                  contentContainerStyle={styles.propertyList}
-                />
+                    data={properties}
+                    renderItem={renderPropertyItem}
+                    keyExtractor={(item) => item.id.toString()}
+                    refreshControl={
+                      <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                    }
+                    onEndReached={loadMoreData} // Trigger load more when user scrolls to the end
+                    onEndReachedThreshold={0.5} // Load more when the user has scrolled 50% to the bottom
+                    ListFooterComponent={loadingMore ? <ActivityIndicator size="large" color="#008a43" /> : null} // Show loading indicator when fetching more
+                  />
               </>
             )}
           </ScrollView>
