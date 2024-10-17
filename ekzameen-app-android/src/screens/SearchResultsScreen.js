@@ -10,35 +10,61 @@ const SearchResultsScreen = ({ navigation, route }) => {
   
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [page, setPage] = useState(1);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
 
   useEffect(() => {
-    const fetchProperties = async () => {
-      try {
-        const filterObject = {
-          basic: {
-            page: 1,
-            perPage: 12,
-          },
-          filters: {
-            propertyType,  // Pass propertyType dynamically
-            cityId,        // Pass cityId dynamically
-            purpose,       // Pass purpose dynamically
-          },
-        };
-
-        const response = await getPropertiesByFilter(filterObject);
-        if (response.data.success) {
-          setProperties(response.data.data);
-        }
-      } catch (error) {
-        console.error('Error fetching properties:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProperties();
+    fetchProperties(true);
   }, [propertyType, cityId, purpose]);  // Re-fetch when propertyType, cityId, or purpose changes
+
+  // Fetch properties function with pagination
+  const fetchProperties = async (resetPage = false) => {
+    if (resetPage) {
+      setLoading(true);
+      setPage(1);
+    } else {
+      setIsFetchingMore(true);
+    }
+
+    try {
+      const filterObject = {
+        basic: {
+          page: resetPage ? 1 : page,
+          perPage: 12,
+        },
+        filters: {
+          propertyType,  // Pass propertyType dynamically
+          cityId,        // Pass cityId dynamically
+          purpose,       // Pass purpose dynamically
+        },
+      };
+
+      const response = await getPropertiesByFilter(filterObject);
+      if (response.data.success) {
+        setProperties(resetPage ? response.data.data : [...properties, ...response.data.data]);
+      }
+    } catch (error) {
+      console.error('Error fetching properties:', error);
+    } finally {
+      setLoading(false);
+      setIsFetchingMore(false);
+    }
+  };
+
+  // Pull to refresh function
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchProperties(true).then(() => setRefreshing(false));
+  };
+
+  // Pagination function when user scrolls to the bottom
+  const onEndReached = () => {
+    if (!isFetchingMore) {
+      setPage(prevPage => prevPage + 1);
+      fetchProperties();
+    }
+  };
 
   // Handle Call
   const handleCall = (phoneNumber) => {
@@ -127,6 +153,10 @@ const SearchResultsScreen = ({ navigation, route }) => {
           renderItem={renderProperty}
           keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={styles.propertyList}
+          onRefresh={onRefresh}
+          refreshing={refreshing}
+          onEndReached={onEndReached}
+          onEndReachedThreshold={0.5}
         />
       )}
     </View>
