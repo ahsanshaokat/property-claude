@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, FlatList, StyleSheet, TextInput, Image, TouchableOpacity, ScrollView, ActivityIndicator, TouchableWithoutFeedback, Linking, Alert } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TextInput, Image, TouchableOpacity, ActivityIndicator, TouchableWithoutFeedback, Linking, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons'; // For icons
 import { getProperties, getPropertyTypes, getCities } from '../data/api/propertyApi'; // Import the functions
 import { useFocusEffect } from '@react-navigation/native'; // To refetch data on focus
 import FontAwesome from 'react-native-vector-icons/FontAwesome'; // Import FontAwesome
-
 
 const HomeScreen = ({ navigation }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -15,12 +14,10 @@ const HomeScreen = ({ navigation }) => {
   const [selectedCity, setSelectedCity] = useState({ id: 14, name: 'Lahore' });
   const [cityDropdownOpen, setCityDropdownOpen] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1); // Pagination page
-const [loadingMore, setLoadingMore] = useState(false); // For pagination loading
-const [refreshing, setRefreshing] = useState(false); // For pull-to-refresh
-const [hasMoreData, setHasMoreData] = useState(true); // To track if more data is available
+  const [refreshing, setRefreshing] = useState(false);
+  const [page, setPage] = useState(1);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
 
-  
   // Function to make a phone call
   const handleCall = (phoneNumber) => {
     const phoneUrl = `tel:${phoneNumber}`;
@@ -63,36 +60,51 @@ const [hasMoreData, setHasMoreData] = useState(true); // To track if more data i
       .catch((err) => console.error('An error occurred', err));
   };
 
-
   // Function to fetch properties, property types, and cities
-  const fetchData = async (pageNumber = 1, isRefreshing = false) => {
-    if (!isRefreshing) {
+  const fetchData = async (resetPage = false) => {
+    if (resetPage) {
       setLoading(true);
+      setPage(1);
+    } else {
+      setIsFetchingMore(true);
     }
+
     try {
-      const propertyResponse = await getProperties(`?page=${pageNumber}&perPage=12&order[updated_at]=DESC`);
-      
-      if (propertyResponse.data.success) {
-        if (pageNumber === 1) {
-          setProperties(propertyResponse.data.data); // Reset properties list on new fetch or refresh
-        } else {
-          setProperties((prevProperties) => [...prevProperties, ...propertyResponse.data.data]); // Append for pagination
-        }
-        setHasMoreData(propertyResponse.data.data.length > 0); // Check if more data is available
+      const propertyResponse = await getProperties(`?page=${resetPage ? 1 : page}&perPage=12&order[updated_at]=DESC`);
+      const typesResponse = await getPropertyTypes();
+      const citiesResponse = await getCities();
+
+      if (propertyResponse.data.success && typesResponse && citiesResponse) {
+        setProperties(resetPage ? propertyResponse.data.data : [...properties, ...propertyResponse.data.data]);
+        setPropertyTypes(typesResponse.data);
+        setCities(citiesResponse.data);
       }
     } catch (error) {
       console.error("Error fetching data: ", error);
     } finally {
       setLoading(false);
-      setLoadingMore(false);
-      setRefreshing(false);
+      setIsFetchingMore(false);
+    }
+  };
+
+  // Pull to refresh function
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchData(true).then(() => setRefreshing(false));
+  };
+
+  // Pagination function when user scrolls to the bottom
+  const onEndReached = () => {
+    if (!isFetchingMore) {
+      setPage(prevPage => prevPage + 1);
+      fetchData();
     }
   };
 
   // Refetch data every time the screen is focused
   useFocusEffect(
     useCallback(() => {
-      fetchData();
+      fetchData(true);
     }, [])
   );
 
@@ -107,15 +119,6 @@ const [hasMoreData, setHasMoreData] = useState(true); // To track if more data i
     }
   };
 
-  const loadMoreData = async () => {
-    if (!loadingMore && hasMoreData) {
-      setLoadingMore(true);
-      const nextPage = page + 1;
-      setPage(nextPage);
-      await fetchData(nextPage); // Fetch more data for the next page
-    }
-  };
-  
   // Function to handle category click
   const handleCategoryClick = (alias) => {
     navigation.navigate('SearchResults', { 
@@ -130,43 +133,13 @@ const [hasMoreData, setHasMoreData] = useState(true); // To track if more data i
     }
   };
 
-  // Function to call the property contact number
-  const makeCall = (number) => {
-    Linking.openURL(`tel:${number}`);
-  };
-
-  // Function to send SMS
-  const sendSMS = (number) => {
-    Linking.openURL(`sms:${number}`);
-  };
-
-  const onRefresh = async () => {
-    setRefreshing(true);
-    setPage(1); // Reset page to 1 for refreshing
-    await fetchData(1, true); // Fetch fresh data
-  };
-
-  // Function to open WhatsApp
-  const openWhatsApp = (number) => {
-    const url = `whatsapp://send?phone=${number}`;
-    Linking.canOpenURL(url)
-      .then((supported) => {
-        if (!supported) {
-          Alert.alert("Error", "WhatsApp is not installed on this device.");
-        } else {
-          return Linking.openURL(url);
-        }
-      })
-      .catch((err) => console.error("Error opening WhatsApp: ", err));
-  };
-
   // Render category item
   const renderCategoryItem = ({ item }) => (
     <TouchableOpacity onPress={() => handleCategoryClick(item.alias)} style={styles.categoryItem}>
       {item.imageUrl.startsWith('http') ? (
         <Image source={{ uri: item.imageUrl }} style={styles.categoryIcon} />
       ) : (
-        <Text style={[styles.textIcon, { color: '#008a43' }]}>{item.imageUrl || '🏠'}</Text> // Theme green color
+        <Text style={[styles.textIcon, { color: '#008a43' }]}>{item.imageUrl || '🏠'}</Text>
       )}
       <Text style={styles.categoryName}>{item.name}</Text>
       <Text style={styles.categoryCount}>({item.propertyCount || 0})</Text>
@@ -229,7 +202,7 @@ const [hasMoreData, setHasMoreData] = useState(true); // To track if more data i
           {/* Buttons for Call, SMS, and WhatsApp */}
           <View style={styles.contactButtons}>
             <TouchableOpacity style={styles.contactButton} onPress={() => handleWhatsApp(item.additionalSpec)}>
-              <FontAwesome  name="whatsapp" size={20} color="#fff" />
+              <FontAwesome name="whatsapp" size={20} color="#fff" />
             </TouchableOpacity>
             <TouchableOpacity style={styles.contactButton} onPress={() => handleSMS(item.additionalSpec)}>
               <Icon name="sms" size={20} color="#fff" />
@@ -238,7 +211,7 @@ const [hasMoreData, setHasMoreData] = useState(true); // To track if more data i
               <Icon name="phone" size={20} color="#fff" />
               <Text style={styles.contactButtonText}>Call</Text>
             </TouchableOpacity>
-        </View>
+          </View>
         </View>
       </View>
     </TouchableOpacity>
@@ -247,49 +220,51 @@ const [hasMoreData, setHasMoreData] = useState(true); // To track if more data i
   return (
     <TouchableWithoutFeedback onPress={closeCityDropdown}>
       <View style={styles.container}>
-          <ScrollView contentContainerStyle={styles.scrollContainer}>
-            {/* Top section including the logo, Buy/Rent toggle, and search bar */}
-            <View style={styles.topSection}>
-              <Image
-                source={{ uri: 'https://ekzameen.com/_next/static/media/headerbg.42b8ac70.png' }}
-                style={styles.backgroundImage}
-              />
-
-              <View style={styles.toggleContainer}>
-                <TouchableOpacity
-                  style={[styles.toggleButton, selectedOption === 'Buy' && styles.activeButton]}
-                  onPress={() => setSelectedOption('Buy')}
-                >
-                  <Text style={[styles.toggleText, selectedOption === 'Buy' ? styles.activeToggleText : styles.inactiveToggleText]}>Buy</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.toggleButton, selectedOption === 'Rent' && styles.activeButton]}
-                  onPress={() => setSelectedOption('Rent')}
-                >
-                  <Text style={[styles.toggleText, selectedOption === 'Rent' ? styles.activeToggleText : styles.inactiveToggleText]}>Rent</Text>
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.searchContainer}>
-                <TextInput
-                  placeholder="Search for properties..."
-                  style={styles.searchBar}
-                  value={searchTerm}
-                  onChangeText={setSearchTerm}
+        <FlatList
+          data={properties}
+          renderItem={renderPropertyItem}
+          keyExtractor={(item) => item.id.toString()}
+          contentContainerStyle={styles.propertyList}
+          ListHeaderComponent={
+            <>
+              <View style={styles.topSection}>
+                <Image
+                  source={{ uri: 'https://ekzameen.com/_next/static/media/headerbg.42b8ac70.png' }}
+                  style={styles.backgroundImage}
                 />
-                {renderCityDropdown()}
-                <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
-                  <Icon name="search" size={20} color="#000" />
-                </TouchableOpacity>
+                <View style={styles.toggleContainer}>
+                  <TouchableOpacity
+                    style={[styles.toggleButton, selectedOption === 'Buy' && styles.activeButton]}
+                    onPress={() => setSelectedOption('Buy')}
+                  >
+                    <Text style={[styles.toggleText, selectedOption === 'Buy' ? styles.activeToggleText : styles.inactiveToggleText]}>Buy</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.toggleButton, selectedOption === 'Rent' && styles.activeButton]}
+                    onPress={() => setSelectedOption('Rent')}
+                  >
+                    <Text style={[styles.toggleText, selectedOption === 'Rent' ? styles.activeToggleText : styles.inactiveToggleText]}>Rent</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.searchContainer}>
+                  <TextInput
+                    placeholder="Search for properties..."
+                    style={styles.searchBar}
+                    value={searchTerm}
+                    onChangeText={setSearchTerm}
+                  />
+                  {renderCityDropdown()}
+                  <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
+                    <Icon name="search" size={20} color="#000" />
+                  </TouchableOpacity>
+                </View>
               </View>
-            </View>
 
-            {/* Category Section with Label */}
-            <Text style={styles.sectionLabel}>Property Categories</Text>
-            {loading ? (
-              <ActivityIndicator size="large" color="#008a43" />
-            ) : (
-              <>
+              {/* Category Section with Label */}
+              <Text style={styles.sectionLabel}>Property Categories</Text>
+              {loading ? (
+                <ActivityIndicator size="large" color="#008a43" />
+              ) : (
                 <View style={styles.categoryContainer}>
                   <FlatList
                     data={propertyTypes}
@@ -300,38 +275,26 @@ const [hasMoreData, setHasMoreData] = useState(true); // To track if more data i
                     contentContainerStyle={styles.categoryGrid}
                   />
                 </View>
-              </>
-            )}
+              )}
 
-            {/* Property Listings Section with Label */}
-            <Text style={styles.sectionLabel}>Property Listings</Text>
-            {loading ? (
-              <ActivityIndicator size="large" color="#008a43" />
-            ) : (
-              <>
-                <FlatList
-                    data={properties}
-                    renderItem={renderPropertyItem}
-                    keyExtractor={(item) => item.id.toString()}
-                    refreshControl={
-                      <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-                    }
-                    onEndReached={loadMoreData} // Trigger load more when user scrolls to the end
-                    onEndReachedThreshold={0.5} // Load more when the user has scrolled 50% to the bottom
-                    ListFooterComponent={loadingMore ? <ActivityIndicator size="large" color="#008a43" /> : null} // Show loading indicator when fetching more
-                  />
-              </>
-            )}
-          </ScrollView>
+              {/* Property Listings Section Label */}
+              <Text style={styles.sectionLabel}>Property Listings</Text>
+            </>
+          }
+          onRefresh={onRefresh}
+          refreshing={refreshing}
+          onEndReached={onEndReached}
+          onEndReachedThreshold={0.5}
+        />
 
-          {/* Floating Add Property Button */}
-          <TouchableOpacity
-            style={styles.floatingButton}
-            onPress={() => navigation.navigate('PostAd')}
-          >
-            <Text style={styles.floatingButtonText}>+</Text>
-          </TouchableOpacity>
-        </View>
+        {/* Floating Add Property Button */}
+        <TouchableOpacity
+          style={styles.floatingButton}
+          onPress={() => navigation.navigate('PostAd')}
+        >
+          <Text style={styles.floatingButtonText}>+</Text>
+        </TouchableOpacity>
+      </View>
     </TouchableWithoutFeedback>
   );
 };
@@ -492,8 +455,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginLeft: 15,
     marginTop: 15,
+    marginBottom: 15,
   },
-  propertyList: { padding: 10 },
+  propertyList: { padding: 0 },
   propertyCard: {
     flexDirection: 'row',
     padding: 15,
