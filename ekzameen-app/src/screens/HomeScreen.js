@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, TextInput, Image, TouchableOpacity, ScrollView, ActivityIndicator, TouchableWithoutFeedback } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons'; // For icons
-import AsyncStorage from '@react-native-async-storage/async-storage'; // For storing and retrieving user tokens
 import { getProperties, getPropertyTypes, getCities } from '../data/api/propertyApi'; // Import the functions
-import AuthWrapper from './AuthWrapper';
 
 const HomeScreen = ({ navigation }) => {
-  const [selectedTab, setSelectedTab] = useState('Residential');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedOption, setSelectedOption] = useState('Buy'); // Buy or Rent (this will set the 'purpose')
   const [properties, setProperties] = useState([]);
@@ -15,23 +12,9 @@ const HomeScreen = ({ navigation }) => {
   const [selectedCity, setSelectedCity] = useState({ id: 14, name: 'Lahore' });
   const [cityDropdownOpen, setCityDropdownOpen] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // State to check login status
 
   // Check if the user is logged in when the component mounts
   useEffect(() => {
-    const checkLoginStatus = async () => {
-      try {
-        const accessToken = await AsyncStorage.getItem('accessToken');
-        if (accessToken) {
-          setIsLoggedIn(true);
-        } else {
-          setIsLoggedIn(false);
-        }
-      } catch (error) {
-        console.error('Error checking login status:', error);
-      }
-    };
-    checkLoginStatus();
   }, []);
 
   // Fetch properties, property types, and cities
@@ -58,11 +41,13 @@ const HomeScreen = ({ navigation }) => {
   }, []);
 
   const handleAddProperty = () => {
-    if (!isLoggedIn) {
-      navigation.navigate('Login');
-    } else {
-      navigation.navigate('PostAd');
-    }
+    
+    navigation.navigate('PostAd');
+    // if (!isLoggedIn) {
+    //   navigation.navigate('Login');
+    // } else {
+    //   navigation.navigate('PostAd');
+    // }
   };
 
   // Function to handle search action
@@ -150,7 +135,7 @@ const HomeScreen = ({ navigation }) => {
               <Text style={styles.detailText}>{item.propertySize} sq ft</Text>
             </View>
           </View>
-          <Text style={styles.propertyPrice}>Rs. {item.price.toLocaleString()}</Text>
+          <Text style={styles.propertyPrice}>Rs. {item.price}</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -158,8 +143,7 @@ const HomeScreen = ({ navigation }) => {
 
   return (
     <TouchableWithoutFeedback onPress={closeCityDropdown}>
-      <AuthWrapper navigation={navigation}>
-        <View style={styles.container}>
+      <View style={styles.container}>
           <ScrollView contentContainerStyle={styles.scrollContainer}>
             {/* Top section including the logo, Buy/Rent toggle, and search bar */}
             <View style={styles.topSection}>
@@ -226,18 +210,17 @@ const HomeScreen = ({ navigation }) => {
           {/* Floating Add Property Button */}
           <TouchableOpacity
             style={styles.floatingButton}
-            onPress={handleAddProperty}
+            onPress={() => navigation.navigate('PostAd')}
           >
             <Text style={styles.floatingButtonText}>+</Text>
           </TouchableOpacity>
         </View>
-      </AuthWrapper>
     </TouchableWithoutFeedback>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f2f2f2' },
+  container: { flex: 1, backgroundColor: '#f2f2f2', zIndex: -1 },
   scrollContainer: { paddingBottom: 100 },
   floatingButton: {
     backgroundColor: '#ffc107',
@@ -347,12 +330,12 @@ const styles = StyleSheet.create({
   },
   categoryGrid: {
     paddingHorizontal: 15,
-    zIndex: 1,  // Ensure this has a lower zIndex than the city dropdown
+    zIndex: -33,  // Ensure this has a lower zIndex than the city dropdown
   },
   categoryRow: {
     justifyContent: 'space-between',
     marginBottom: 10,
-    zIndex: 1,  // Ensure this has a lower zIndex than the city dropdown
+    zIndex: -4,  // Ensure this has a lower zIndex than the city dropdown
   },
   categoryItem: {
     alignItems: 'center',
@@ -362,12 +345,13 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: '#f7f7f7',
     marginBottom: 15,
-    zIndex: 1,  // Lower zIndex for category items
+    zIndex: -1,  // Lower zIndex for category items
   },
   categoryIcon: {
     width: 40,
     height: 40,
     marginBottom: 10,
+    zIndex: -1,  // Lower zIndex for category items
     resizeMode: 'contain',
   },
   textIcon: {

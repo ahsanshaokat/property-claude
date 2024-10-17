@@ -1,5 +1,5 @@
 import 'react-native-gesture-handler';
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createDrawerNavigator, DrawerContentScrollView } from '@react-navigation/drawer';
@@ -45,7 +45,8 @@ const MainStack = () => (
 
 // Custom Drawer Content with Sign Out button and user check
 const CustomDrawerContent = (props) => {
-  const { user, logoutUser } = useContext(AuthContext); // Get user and logout from context
+  const { logoutUser } = useContext(AuthContext); // Get user and logout from context
+  const [user, setUser] = useState(null); // User state
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -61,21 +62,6 @@ const CustomDrawerContent = (props) => {
     };
     fetchUser();
   }, []);
-
-  // Function to handle sign-out
-  const handleSignOut = async () => {
-    try {
-      // Clear access tokens and user data from AsyncStorage
-      await AsyncStorage.removeItem('accessToken');
-      await AsyncStorage.removeItem('refreshToken');
-      await AsyncStorage.removeItem('user');
-      // Redirect the user to the login screen
-      props.navigation.navigate('Login');
-      setUser(null); // Clear local state
-    } catch (error) {
-      console.error('Error signing out:', error);
-    }
-  };
 
   return (
     <DrawerContentScrollView {...props}>

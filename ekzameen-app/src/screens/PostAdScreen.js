@@ -1,6 +1,6 @@
+/* eslint-disable react/prop-types */
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, ScrollView, Switch, Picker, ActivityIndicator, CheckBox, Alert } from 'react-native';
-import { launchImageLibrary } from 'react-native-image-picker'; // For selecting images
 import { getPropertyTypes, getCities, getFeatures, createProperty, uploadImage } from '../data/api/propertyApi'; // Assuming these are defined
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
 

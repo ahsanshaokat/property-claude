@@ -1,5 +1,5 @@
 import React, {useContext } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -87,7 +87,7 @@ const LoginScreen = ({ navigation }) => {
       </TouchableOpacity>
 
       <View style={styles.signupContainer}>
-        <Text>Don't have an account?</Text>
+        <Text>Do not have an account?</Text>
         <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
           <Text style={styles.signupText}> Sign Up with Username</Text>
         </TouchableOpacity>

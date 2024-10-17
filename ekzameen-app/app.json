@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "ekzameen.com",
-    "slug": "ekzameen.com",
-    "version": "1.0.0",
+    "name": "Ekzameen",
+    "slug": "ekzameencom",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -26,8 +26,9 @@
     },
     "extra": {
       "eas": {
-        "projectId": "b4154803-d98a-4dfa-ab02-e68a28e6d73a"
+        "projectId": "718b1e63-50aa-4cbf-987a-ad2983ac00ca"
       }
-    }
+    },
+    "owner": "ahsanshaokat"
   }
 }

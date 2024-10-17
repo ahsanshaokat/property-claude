@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
 import { getPropertyDetails } from '../data/api/propertyApi'; // Import your API function
 import Icon from 'react-native-vector-icons/MaterialIcons'; // For icons
 import { useNavigation } from '@react-navigation/native'; // To use navigation for the back button
@@ -76,7 +76,7 @@ const PropertyDetailsScreen = ({ route }) => {
       {/* Property Information */}
       <View style={styles.infoContainer}>
         <Text style={styles.propertyTitle}>{property.name}</Text>
-        <Text style={styles.propertyPrice}>PKR {property.price?.toLocaleString()}</Text>
+        <Text style={styles.propertyPrice}>PKR {property.price}</Text>
         <Text style={styles.propertyLocation}>{property.address}</Text>
         <Text style={styles.postedTime}>Posted {moment(property.created_at).fromNow()}</Text>
 

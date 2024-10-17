@@ -67,7 +67,7 @@ const SearchResultsScreen = ({ navigation, route }) => {
         {/* Property Details */}
         <View style={styles.propertyInfo}>
           <Text style={styles.propertyTitle}>{item.name}</Text>
-          <Text style={styles.propertyPrice}>PKR {item.price.toLocaleString()}</Text>
+          <Text style={styles.propertyPrice}>PKR {item.price}</Text>
           <Text style={styles.propertyLocation}>{item.address}</Text>
           
           {/* Bed, Bath, Size Icons */}
