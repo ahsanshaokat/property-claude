@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, FlatList, StyleSheet, TextInput, Image, TouchableOpacity, ScrollView, ActivityIndicator, TouchableWithoutFeedback } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons'; // For icons
 import { getProperties, getPropertyTypes, getCities } from '../data/api/propertyApi'; // Import the functions
+import { useFocusEffect } from '@react-navigation/native'; // To refetch data on focus
 
 const HomeScreen = ({ navigation }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -13,41 +14,35 @@ const HomeScreen = ({ navigation }) => {
   const [cityDropdownOpen, setCityDropdownOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Check if the user is logged in when the component mounts
-  useEffect(() => {
-  }, []);
+  // Function to fetch properties, property types, and cities
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const propertyResponse = await getProperties("?page=1&perPage=12&order[updated_at]=DESC");
+      const typesResponse = await getPropertyTypes();
+      const citiesResponse = await getCities();
 
-  // Fetch properties, property types, and cities
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const propertyResponse = await getProperties("?page=1&perPage=12&order[updated_at]=DESC");
-        const typesResponse = await getPropertyTypes();
-        const citiesResponse = await getCities();
-
-        if (propertyResponse.data.success && typesResponse && citiesResponse) {
-          setProperties(propertyResponse.data.data); // Set properties list
-          setPropertyTypes(typesResponse.data); // Set property types
-          setCities(citiesResponse.data); // Set cities list
-        }
-      } catch (error) {
-        console.error("Error fetching data: ", error);
-      } finally {
-        setLoading(false);
+      if (propertyResponse.data.success && typesResponse && citiesResponse) {
+        setProperties(propertyResponse.data.data); // Set properties list
+        setPropertyTypes(typesResponse.data); // Set property types
+        setCities(citiesResponse.data); // Set cities list
       }
-    };
+    } catch (error) {
+      console.error("Error fetching data: ", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchData();
-  }, []);
+  // Refetch data every time the screen is focused
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+    }, [])
+  );
 
   const handleAddProperty = () => {
-    
     navigation.navigate('PostAd');
-    // if (!isLoggedIn) {
-    //   navigation.navigate('Login');
-    // } else {
-    //   navigation.navigate('PostAd');
-    // }
   };
 
   // Function to handle search action
@@ -181,7 +176,8 @@ const HomeScreen = ({ navigation }) => {
               </View>
             </View>
 
-            {/* Category Grid */}
+            {/* Category Section with Label */}
+            <Text style={styles.sectionLabel}>Property Categories</Text>
             {loading ? (
               <ActivityIndicator size="large" color="#008a43" />
             ) : (
@@ -195,14 +191,22 @@ const HomeScreen = ({ navigation }) => {
                     columnWrapperStyle={styles.categoryRow}
                     contentContainerStyle={styles.categoryGrid}
                   />
-                  {/* Property Listings */}
-                  <FlatList
-                    data={properties}
-                    renderItem={renderPropertyItem}
-                    keyExtractor={(item) => item.id.toString()}
-                    contentContainerStyle={styles.propertyList}
-                  />
                 </View>
+              </>
+            )}
+
+            {/* Property Listings Section with Label */}
+            <Text style={styles.sectionLabel}>Property Listings</Text>
+            {loading ? (
+              <ActivityIndicator size="large" color="#008a43" />
+            ) : (
+              <>
+                <FlatList
+                  data={properties}
+                  renderItem={renderPropertyItem}
+                  keyExtractor={(item) => item.id.toString()}
+                  contentContainerStyle={styles.propertyList}
+                />
               </>
             )}
           </ScrollView>
@@ -364,6 +368,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#666',
     textAlign: 'center',
+  },
+  sectionLabel: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginLeft: 15,
+    marginTop: 10,
   },
   propertyList: { padding: 10 },
   propertyCard: {

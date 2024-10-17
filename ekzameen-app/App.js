@@ -1,31 +1,33 @@
-import React, { useEffect } from 'react';
-import { View, Text, Platform } from 'react-native';
-import WebView from 'react-native-webview';
+import React from 'react';
+import { WebView } from 'react-native-webview';
+import { Linking, Alert } from 'react-native'; // Linking from react-native
 
-const WebViewScreen = () => {
-  useEffect(() => {
-    if (Platform.OS === 'web') {
-      // Open the URL in the browser for Web platform
-      window.location.href = 'https://app.ekzameen.com/';
+const WebViewApp = () => {
+  
+  // Function to handle external URLs like calls, SMS, WhatsApp, etc.
+  const handleExternalLink = (event) => {
+    const { url } = event;
+
+    // Check if the URL is a tel: (call), sms: (SMS), or WhatsApp link
+    if (url.startsWith('tel:') || url.startsWith('sms:') || url.startsWith('whatsapp://')) {
+      // Use Linking API to open external apps
+      Linking.openURL(url).catch(err => 
+        Alert.alert('Error', 'Unable to open the link')
+      );
+      return false; // Prevent WebView from handling this URL
     }
-  }, []);
 
-  // Handle other platforms
-  if (Platform.OS === 'android' || Platform.OS === 'ios') {
-    return (
-      <WebView
-        source={{ uri: 'https://app.ekzameen.com/' }}
-        style={{ flex: 1 }}
-      />
-    );
-  } else {
-    // Fallback for unsupported platforms (native apps)
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text>WebView is not supported on this platform.</Text>
-      </View>
-    );
-  }
+    return true; // Allow WebView to handle other URLs
+  };
+
+  return (
+    <WebView
+      source={{ uri: 'https://app.ekzameen.com/' }} // Your WebView URL
+      onShouldStartLoadWithRequest={handleExternalLink} // Intercept external URLs
+      javaScriptEnabled={true} // Enable JavaScript
+      domStorageEnabled={true} // Enable DOM Storage if needed
+    />
+  );
 };
 
-export default WebViewScreen;
+export default WebViewApp;

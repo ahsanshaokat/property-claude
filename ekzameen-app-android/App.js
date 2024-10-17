@@ -63,6 +63,23 @@ const CustomDrawerContent = (props) => {
     fetchUser();
   }, []);
 
+  // Logout Function
+  const handleLogout = async () => {
+    try {
+      // Clear the user session or token from AsyncStorage
+      await AsyncStorage.removeItem('user');
+      await AsyncStorage.removeItem('accessToken');
+
+      // Perform any additional cleanup if needed
+      logoutUser(); // Clear any auth context-related states
+
+      // Navigate to the login screen
+      props.navigation.navigate('Login');
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
+  };
+
   return (
     <DrawerContentScrollView {...props}>
     <View style={styles.drawerContent}>
@@ -135,7 +152,7 @@ const CustomDrawerContent = (props) => {
 
         {/* Sign Out Button at the bottom */}
         {user && (
-          <TouchableOpacity style={styles.signOutButton} onPress={logoutUser}>
+          <TouchableOpacity style={styles.signOutButton} onPress={handleLogout}>
             <Icon name="logout" size={24} color="#fff" />
             <Text style={styles.drawerText}>Sign Out</Text>
           </TouchableOpacity>

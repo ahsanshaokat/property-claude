@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, Picker } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { login, signUp, saveAuthData } from '../data/api/authApi'; // Your signup API function
+import ModalSelector from 'react-native-modal-selector';
+import { login, signUp, saveAuthData } from '../data/api/authApi';
 
 // Validation schema using Yup
 const signUpSchema = yup.object({
@@ -20,49 +21,29 @@ const SignUpScreen = ({ navigation }) => {
     resolver: yupResolver(signUpSchema),
   });
 
-  // Watch username field to generate email dynamically
   const username = watch('username');
   const email = `${username}@tempmail.com`; // Hidden email, generated from username
 
+  // Data for ModalSelector
+  const signUpOptions = [
+    { key: 'user', label: 'User' },
+    { key: 'agent', label: 'Agent' },
+  ];
+
   // Function to handle sign-up form submission
   const onSubmit = async (data) => {
-    console.log('onSubmit invoked');
     try {
-      // Generate email based on username
       const email = `${data.username}@tempmail.com`;
-  
-      // Construct formData for signup
-      const formData = {
-        ...data,
-        email, // Hidden email generated from username
-        role: signUpAs, // Include the selected role from the state
-      };
-  
-      console.log('Submitting Form Data: ', formData);
-  
-      // Make the sign-up request
+      const formData = { ...data, email, role: signUpAs };
+
       const signUpResponse = await signUp(formData);
-  
       if (signUpResponse && signUpResponse.data) {
-        console.log('Sign Up Successful: ', signUpResponse.data);
-  
-        // Automatically log in the user using their username and password
-        const loginData = {
-          username: formData.username,
-          password: formData.password,
-        };
-  
+        const loginData = { username: formData.username, password: formData.password };
         const loginResponse = await login(loginData);
-  
+
         if (loginResponse && loginResponse.data) {
-          console.log('Login Successful: ', loginResponse.data);
-  
-          // Save user token, profile, etc. (depends on your auth handling)
-          // Assuming you have a function to handle token saving
           saveAuthData(loginResponse.data);
-  
           Alert.alert('Welcome', 'You have been logged in automatically!', [{ text: 'OK', onPress: () => navigation.navigate('Home') }]);
-        
           navigation.navigate('Home');
         } else {
           Alert.alert('Login Failed', 'Unable to log in automatically. Please try logging in manually.');
@@ -78,56 +59,56 @@ const SignUpScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Create account</Text>
+      <Text style={styles.title}>Create Account</Text>
 
       <Controller
         control={control}
         name="firstName"
         render={({ field: { onChange, value } }) => (
           <TextInput
-            style={styles.input}
+            style={[styles.input, errors.firstName && styles.inputError]}
             placeholder="First Name"
             value={value}
             onChangeText={onChange}
           />
         )}
       />
-      {errors.firstName && <Text style={styles.error}>{errors.firstName.message}</Text>}
+      {errors.firstName && <Text style={styles.errorText}>{errors.firstName.message}</Text>}
 
       <Controller
         control={control}
         name="lastName"
         render={({ field: { onChange, value } }) => (
           <TextInput
-            style={styles.input}
+            style={[styles.input, errors.lastName && styles.inputError]}
             placeholder="Last Name"
             value={value}
             onChangeText={onChange}
           />
         )}
       />
-      {errors.lastName && <Text style={styles.error}>{errors.lastName.message}</Text>}
+      {errors.lastName && <Text style={styles.errorText}>{errors.lastName.message}</Text>}
 
       <Controller
         control={control}
         name="username"
         render={({ field: { onChange, value } }) => (
           <TextInput
-            style={styles.input}
+            style={[styles.input, errors.username && styles.inputError]}
             placeholder="Username"
             value={value}
             onChangeText={onChange}
           />
         )}
       />
-      {errors.username && <Text style={styles.error}>{errors.username.message}</Text>}
+      {errors.username && <Text style={styles.errorText}>{errors.username.message}</Text>}
 
       <Controller
         control={control}
         name="phone"
         render={({ field: { onChange, value } }) => (
           <TextInput
-            style={styles.input}
+            style={[styles.input, errors.phone && styles.inputError]}
             placeholder="Phone"
             keyboardType="phone-pad"
             value={value}
@@ -135,27 +116,25 @@ const SignUpScreen = ({ navigation }) => {
           />
         )}
       />
-      {errors.phone && <Text style={styles.error}>{errors.phone.message}</Text>}
+      {errors.phone && <Text style={styles.errorText}>{errors.phone.message}</Text>}
 
       {/* Sign Up As Picker */}
-      <View style={styles.pickerContainer}>
-        <Text style={styles.pickerLabel}>Sign Up As</Text>
-        <Picker
-          selectedValue={signUpAs}
-          style={styles.picker}
-          onValueChange={(itemValue) => setSignUpAs(itemValue)}
-        >
-          <Picker.Item label="User" value="user" />
-          <Picker.Item label="Agent" value="agent" />
-        </Picker>
-      </View>
+      <Text style={styles.label}>Sign Up As</Text>
+      <ModalSelector
+        data={signUpOptions}
+        initValue={signUpAs === 'user' ? 'User' : 'Agent'}
+        onChange={(option) => setSignUpAs(option.key)}
+        style={styles.modalPicker}
+        initValueTextStyle={styles.pickerText}
+        selectTextStyle={styles.pickerText}
+      />
 
       <Controller
         control={control}
         name="password"
         render={({ field: { onChange, value } }) => (
           <TextInput
-            style={styles.input}
+            style={[styles.input, errors.password && styles.inputError]}
             placeholder="Password"
             secureTextEntry
             value={value}
@@ -163,9 +142,11 @@ const SignUpScreen = ({ navigation }) => {
           />
         )}
       />
-      {errors.password && <Text style={styles.error}>{errors.password.message}</Text>}
+      {errors.password && <Text style={styles.errorText}>{errors.password.message}</Text>}
 
-      <Button title="Submit" onPress={handleSubmit(onSubmit)} />
+      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit(onSubmit)}>
+        <Text style={styles.submitButtonText}>Submit</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -174,36 +155,61 @@ const SignUpScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    padding: 20,
+    backgroundColor: '#f8f8f8',
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
+    fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
-    fontWeight: 'bold',
+    color: '#008a43',
+  },
+  label: {
+    fontSize: 16,
+    marginBottom: 5,
+    color: '#333',
   },
   input: {
     borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
     padding: 10,
     marginBottom: 10,
-    borderRadius: 4,
-    borderColor: '#ccc',
+    backgroundColor: '#fff',
+    fontSize: 16,
+    color: '#333',
   },
-  error: {
+  inputError: {
+    borderColor: 'red',
+  },
+  errorText: {
     color: 'red',
     marginBottom: 10,
   },
-  pickerContainer: {
+  submitButton: {
+    backgroundColor: '#008a43',
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  submitButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  modalPicker: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 10,
     marginBottom: 10,
   },
-  pickerLabel: {
+  pickerText: {
     fontSize: 16,
-    marginBottom: 5,
-  },
-  picker: {
-    height: 50,
-    borderWidth: 1,
-    borderColor: '#ccc',
+    color: '#333',
   },
 });
 

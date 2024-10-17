@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Linking, Alert } from 'react-native';
 import { getPropertyDetails } from '../data/api/propertyApi'; // Import your API function
 import Icon from 'react-native-vector-icons/MaterialIcons'; // For icons
 import { useNavigation } from '@react-navigation/native'; // To use navigation for the back button
@@ -43,6 +43,48 @@ const PropertyDetailsScreen = ({ route }) => {
       style={styles.carouselImage} 
     />
   );
+
+  // Function to make a phone call
+  const handleCall = (phoneNumber) => {
+    const phoneUrl = `tel:${phoneNumber}`;
+    Linking.canOpenURL(phoneUrl)
+      .then((supported) => {
+        if (!supported) {
+          Alert.alert('Error', `Can't handle phone call`);
+        } else {
+          return Linking.openURL(phoneUrl);
+        }
+      })
+      .catch((err) => console.error('An error occurred', err));
+  };
+
+  // Function to send an SMS
+  const handleSMS = (phoneNumber) => {
+    const smsUrl = `sms:${phoneNumber}`;
+    Linking.canOpenURL(smsUrl)
+      .then((supported) => {
+        if (!supported) {
+          Alert.alert('Error', `Can't handle SMS`);
+        } else {
+          return Linking.openURL(smsUrl);
+        }
+      })
+      .catch((err) => console.error('An error occurred', err));
+  };
+
+  // Function to open WhatsApp
+  const handleWhatsApp = (phoneNumber) => {
+    const whatsappUrl = `whatsapp://send?phone=${phoneNumber}`;
+    Linking.canOpenURL(whatsappUrl)
+      .then((supported) => {
+        if (!supported) {
+          Alert.alert('Error', `WhatsApp is not installed on this device`);
+        } else {
+          return Linking.openURL(whatsappUrl);
+        }
+      })
+      .catch((err) => console.error('An error occurred', err));
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -114,13 +156,13 @@ const PropertyDetailsScreen = ({ route }) => {
 
       {/* Bottom Buttons (Call, Message, WhatsApp) */}
       <View style={styles.bottomButtons}>
-        <TouchableOpacity style={styles.button} onPress={() => alert(`Calling ${property.additionalSpec}`)}>
+        <TouchableOpacity style={styles.button} onPress={() => handleCall(property.additionalSpec)}>
           <Text style={styles.buttonText}>Call</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => alert(`Sending message to ${property.additionalSpec}`)}>
+        <TouchableOpacity style={styles.button} onPress={() => handleSMS(property.additionalSpec)}>
           <Text style={styles.buttonText}>Message</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => alert(`Opening WhatsApp to ${property.additionalSpec}`)}>
+        <TouchableOpacity style={styles.button} onPress={() => handleWhatsApp(property.additionalSpec)}>
           <Text style={styles.buttonText}>WhatsApp</Text>
         </TouchableOpacity>
       </View>
