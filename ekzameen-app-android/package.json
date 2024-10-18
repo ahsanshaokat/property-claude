@@ -19,6 +19,7 @@
     "@types/react": "~18.2.79",
     "axios": "^1.7.7",
     "axios-retry": "^4.5.0",
+    "date-fns": "^4.1.0",
     "ekzameen.com": "file:",
     "expo": "~51.0.28",
     "expo-status-bar": "~1.12.1",

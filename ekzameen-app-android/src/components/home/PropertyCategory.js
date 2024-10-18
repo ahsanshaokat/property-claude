@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f0f0f0',
   },
   container: {
-    width: '95%',
+    width: '97%',
     backgroundColor: '#fff',
     borderRadius: 10,
     padding: 15,

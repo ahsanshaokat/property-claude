@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, Linking, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import moment from 'moment';
 
 const PropertyListing = ({ property, onPropertyClick }) => {
 
@@ -47,6 +48,34 @@ const PropertyListing = ({ property, onPropertyClick }) => {
       .catch((err) => console.error('An error occurred', err));
   };
 
+  // Format price
+  const formatPrice = (price) => {
+    if (price >= 10000000) {
+      return `${(price / 10000000).toFixed(1)} Cr`;
+    } else if (price >= 100000) {
+      const value = price / 100000;
+      return value === 1 ? `${value} Lac` : `${value.toFixed(1)} Lacs`;
+    }
+    return price.toLocaleString();
+  };
+
+  // Format timestamp to human-readable format using moment
+  const formatTimestamp = (timestamp) => {
+    return moment(timestamp).fromNow();
+  };
+
+  // Convert square footage to Marla, Kanal, or Acres
+  const convertSize = (sqft) => {
+    if (sqft >= 43560) {
+      return `${(sqft / 43560).toFixed(2)} Acre`;
+    } else if (sqft >= 5445) {
+      return `${(sqft / 5445).toFixed(2)} Kanal`;
+    } else if (sqft >= 225) {
+      return `${(sqft / 225).toFixed(2)} Marla`;
+    }
+    return `${sqft} sq ft`;
+  };
+
   return (
     <TouchableOpacity onPress={() => onPropertyClick(property.id)}>
       <View style={styles.propertyCard}>
@@ -71,19 +100,23 @@ const PropertyListing = ({ property, onPropertyClick }) => {
             </View>
             <View style={styles.propertyDetailItem}>
               <Icon name="straighten" size={16} color="#008a43" />
-              <Text style={styles.detailText}>{property.propertySize} sq ft</Text>
+              <Text style={styles.detailText}>{convertSize(property.propertySize)}</Text>
             </View>
           </View>
-          <Text style={styles.propertyPrice}>Rs. {property.price}</Text>
+          <Text style={styles.propertyPrice}>Rs. {formatPrice(property.price)}</Text>
+          <Text style={styles.timestamp}>{formatTimestamp(property.updated_at)}</Text>
           <View style={styles.contactButtons}>
             <TouchableOpacity style={styles.contactButton} onPress={() => handleWhatsApp(property.additionalSpec)}>
               <FontAwesome name="whatsapp" size={18} color="#fff" />
+              <Text style={styles.contactButtonText}></Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.contactButton} onPress={() => handleSMS(property.additionalSpec)}>
               <Icon name="sms" size={18} color="#fff" />
+              <Text style={styles.contactButtonText}>SMS</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.contactButton} onPress={() => handleCall(property.additionalSpec)}>
               <Icon name="phone" size={18} color="#fff" />
+              <Text style={styles.contactButtonText}>Call</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -95,17 +128,16 @@ const PropertyListing = ({ property, onPropertyClick }) => {
 const styles = StyleSheet.create({
   propertyCard: {
     flexDirection: 'row',
-    padding: 10,
+    padding: 15,
     backgroundColor: '#fff',
     borderRadius: 10,
     marginBottom: 10,
     elevation: 2,
-    position: 'relative',
-    alignItems: 'center',
+    marginHorizontal: 10,
+    alignItems: 'flex-start',
     shadowColor: '#000',
     shadowOpacity: 0.1,
-    shadowRadius: 5,
-    marginHorizontal: 10,
+    shadowRadius: 6,
   },
   propertyTag: {
     position: 'absolute',
@@ -129,17 +161,17 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   propertyImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 8,
-    marginRight: 10,
+    width: 120,
+    height: 120,
+    borderRadius: 10,
+    marginRight: 15,
   },
   propertyInfo: {
     flex: 1,
     justifyContent: 'space-between',
   },
   propertyTitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
     color: '#333',
   },
@@ -163,9 +195,14 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   propertyPrice: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 20,
+    fontWeight: '700',
     color: '#008a43',
+    marginTop: 5,
+  },
+  timestamp: {
+    fontSize: 12,
+    color: '#888',
     marginTop: 5,
   },
   contactButtons: {
@@ -175,18 +212,20 @@ const styles = StyleSheet.create({
   },
   contactButton: {
     backgroundColor: '#008a43',
-    paddingVertical: 8,
-    paddingHorizontal: 15,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
     borderRadius: 5,
-    marginHorizontal: 5,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 3,
+    flex: 1,
   },
   contactButtonText: {
     color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 14,
     marginLeft: 5,
+    fontWeight: 'bold',
+    fontSize: 12,
   },
 });
 
