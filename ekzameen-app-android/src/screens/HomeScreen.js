@@ -145,7 +145,7 @@ const HomeScreen = ({ navigation }) => {
                 setActiveCategory={setActiveCategory} 
                 onCategoryClick={(alias) => navigation.navigate('SearchResults', { propertyType: alias })} 
               />
-              <Text style={styles.sectionLabel}>Property Categories</Text>
+              <Text style={styles.sectionLabel}>Property Listings</Text>
             </>
           }
           renderItem={({ item }) => (
