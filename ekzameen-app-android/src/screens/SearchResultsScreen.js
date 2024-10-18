@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image, ActivityIndicator, Linking, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';  // For icons
-import moment from 'moment';  // For time formatting
-import { getPropertiesByFilter } from '../data/api/propertyApi';  // Updated API function to get properties by filter
-import Communications from 'react-native-communications';  // To handle SMS, Call, etc.
+import FontAwesome from 'react-native-vector-icons/FontAwesome'; // For WhatsApp icon
+import moment from 'moment';
+import { getPropertiesByFilter } from '../data/api/propertyApi';
 
 const SearchResultsScreen = ({ navigation, route }) => {
-  const { propertyType, cityId, purpose } = route.params;  // Directly extract propertyType and cityId from route.params
+  const { propertyType, cityId, purpose } = route.params;
   
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,9 +16,8 @@ const SearchResultsScreen = ({ navigation, route }) => {
 
   useEffect(() => {
     fetchProperties(true);
-  }, [propertyType, cityId, purpose]);  // Re-fetch when propertyType, cityId, or purpose changes
+  }, [propertyType, cityId, purpose]);
 
-  // Fetch properties function with pagination
   const fetchProperties = async (resetPage = false) => {
     if (resetPage) {
       setLoading(true);
@@ -34,9 +33,9 @@ const SearchResultsScreen = ({ navigation, route }) => {
           perPage: 12,
         },
         filters: {
-          propertyType,  // Pass propertyType dynamically
-          cityId,        // Pass cityId dynamically
-          purpose,       // Pass purpose dynamically
+          propertyType,
+          cityId,
+          purpose,
         },
       };
 
@@ -52,13 +51,11 @@ const SearchResultsScreen = ({ navigation, route }) => {
     }
   };
 
-  // Pull to refresh function
   const onRefresh = () => {
     setRefreshing(true);
     fetchProperties(true).then(() => setRefreshing(false));
   };
 
-  // Pagination function when user scrolls to the bottom
   const onEndReached = () => {
     if (!isFetchingMore) {
       setPage(prevPage => prevPage + 1);
@@ -66,18 +63,16 @@ const SearchResultsScreen = ({ navigation, route }) => {
     }
   };
 
-  // Handle Call
   const handleCall = (phoneNumber) => {
     const url = `tel:${phoneNumber}`;
     Linking.openURL(url).catch(err => Alert.alert('Error', 'Failed to make a call.'));
   };
 
-  // Handle SMS
   const handleSMS = (phoneNumber) => {
-    Communications.text(phoneNumber, 'Hello, I am interested in this property.');
+    const smsUrl = `sms:${phoneNumber}`;
+    Linking.openURL(smsUrl).catch(() => Alert.alert('Error', 'Failed to send SMS.'));
   };
 
-  // Handle WhatsApp
   const handleWhatsApp = (phoneNumber) => {
     const whatsappURL = `whatsapp://send?phone=${phoneNumber}&text=Hello, I am interested in this property.`;
     Linking.openURL(whatsappURL).catch(() => Alert.alert('Error', 'WhatsApp is not installed on your device.'));
@@ -86,39 +81,52 @@ const SearchResultsScreen = ({ navigation, route }) => {
   const renderProperty = ({ item }) => (
     <TouchableOpacity onPress={() => navigation.navigate('PropertyDetails', { propertyId: item.id })}>
       <View style={styles.propertyCard}>
-        {/* Image with count */}
-        <Image source={{ uri: item.propertyImages.length > 0 ? item.propertyImages[0].image_url : 'https://via.placeholder.com/150' }} style={styles.propertyImage} />
-        <Text style={styles.imageCount}>{item.propertyImages.length}</Text>
+        {/* Image */}
+        <View style={styles.imageContainer}>
+          <Image
+            source={{ uri: item.propertyImages.length > 0 ? item.propertyImages[0].image_url : 'https://via.placeholder.com/150' }}
+            style={styles.propertyImage}
+          />
+          <View style={[styles.tag, item.purpose === 'SALE' ? styles.saleTag : styles.rentTag]}>
+            <Text style={styles.tagText}>{item.purpose}</Text>
+          </View>
+        </View>
 
         {/* Property Details */}
         <View style={styles.propertyInfo}>
-          <Text style={styles.propertyTitle}>{item.name}</Text>
-          <Text style={styles.propertyPrice}>PKR {item.price}</Text>
-          <Text style={styles.propertyLocation}>{item.address}</Text>
+          <Text style={styles.propertyTitle} numberOfLines={1}>{item.name}</Text>
+          <Text style={styles.propertyLocation} numberOfLines={1}>{item.address}</Text>
           
-          {/* Bed, Bath, Size Icons */}
           <View style={styles.propertyDetails}>
-            <Icon name="king-bed" size={18} color="#555" />
-            <Text style={styles.detailText}>{item.noOfBedRoom} Beds</Text>
-            <Icon name="bathtub" size={18} color="#555" />
-            <Text style={styles.detailText}>{item.noOfBathRoom} Baths</Text>
-            <Icon name="straighten" size={18} color="#555" />
-            <Text style={styles.detailText}>{item.propertySize} sq ft</Text>
+            <View style={styles.propertyDetailItem}>
+              <Icon name="king-bed" size={16} color="#008a43" />
+              <Text style={styles.detailText}>{item.noOfBedRoom} Beds</Text>
+            </View>
+            <View style={styles.propertyDetailItem}>
+              <Icon name="bathtub" size={16} color="#008a43" />
+              <Text style={styles.detailText}>{item.noOfBathRoom} Baths</Text>
+            </View>
+            <View style={styles.propertyDetailItem}>
+              <Icon name="straighten" size={16} color="#008a43" />
+              <Text style={styles.detailText}>{item.propertySize} sq ft</Text>
+            </View>
           </View>
 
-          {/* Time of post */}
+          <Text style={styles.propertyPrice}>PKR {item.price.toLocaleString()}</Text>
           <Text style={styles.postedTime}>{moment(item.created_at).fromNow()}</Text>
 
-          {/* Action Buttons (SMS, Call, WhatsApp) */}
           <View style={styles.actionButtons}>
+            <TouchableOpacity style={styles.button} onPress={() => handleWhatsApp(item.additionalSpec)}>
+              <FontAwesome name="whatsapp" size={18} color="#fff" />
+              <Text style={styles.buttonText}></Text>
+            </TouchableOpacity>
             <TouchableOpacity style={styles.button} onPress={() => handleSMS(item.additionalSpec)}>
+              <Icon name="sms" size={18} color="#fff" />
               <Text style={styles.buttonText}>SMS</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.button} onPress={() => handleCall(item.additionalSpec)}>
+              <Icon name="phone" size={18} color="#fff" />
               <Text style={styles.buttonText}>Call</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={() => handleWhatsApp(item.additionalSpec)}>
-              <Text style={styles.buttonText}>WhatsApp</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -128,23 +136,6 @@ const SearchResultsScreen = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      {/* Filter Options */}
-      <View style={styles.filtersContainer}>
-        <TouchableOpacity style={styles.filterButton}>
-          <Text style={styles.filterText}>Filters</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.filterButton}>
-          <Text style={styles.filterText}>Sort</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.filterButton}>
-          <Text style={styles.filterText}>Location</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.filterButton}>
-          <Text style={styles.filterText}>Price Range</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Properties List */}
       {loading ? (
         <ActivityIndicator size="large" color="#008a43" />
       ) : (
@@ -169,21 +160,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#f2f2f2',
     paddingHorizontal: 10,
   },
-  filtersContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginVertical: 10,
-  },
-  filterButton: {
-    backgroundColor: '#e0e0e0',
-    padding: 10,
-    borderRadius: 5,
-    marginHorizontal: 5,
-  },
-  filterText: {
-    fontSize: 14,
-    color: '#333',
-  },
   propertyList: {
     paddingBottom: 20,
   },
@@ -194,55 +170,73 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 15,
     elevation: 2,
+    position: 'relative',
+  },
+  imageContainer: {
+    position: 'relative',
   },
   propertyImage: {
     width: 120,
     height: 100,
     borderRadius: 10,
   },
-  imageCount: {
+  tag: {
     position: 'absolute',
-    bottom: 5,
-    right: 5,
-    color: '#fff',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    padding: 5,
+    top: 5,
+    left: 5,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
     borderRadius: 5,
+  },
+  saleTag: {
+    backgroundColor: '#ffc107',
+  },
+  rentTag: {
+    backgroundColor: '#ff5733',
+  },
+  tagText: {
+    color: '#fff',
     fontSize: 12,
+    fontWeight: 'bold',
   },
   propertyInfo: {
     flex: 1,
     paddingLeft: 10,
+    justifyContent: 'center',
   },
   propertyTitle: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#333',
   },
+  propertyLocation: {
+    fontSize: 12,
+    color: '#666',
+    marginBottom: 5,
+  },
+  propertyDetails: {
+    flexDirection: 'row',
+    marginVertical: 5,
+  },
+  propertyDetailItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 10,
+  },
+  detailText: {
+    fontSize: 12,
+    color: '#008a43',
+    marginLeft: 4,
+  },
   propertyPrice: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#008a43',
-    marginBottom: 5,
-  },
-  propertyLocation: {
-    fontSize: 14,
-    color: '#666',
-  },
-  propertyDetails: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 5,
-  },
-  detailText: {
-    marginLeft: 5,
-    marginRight: 15,
-    fontSize: 14,
+    marginVertical: 5,
   },
   postedTime: {
     fontSize: 12,
     color: '#888',
-    marginTop: 5,
   },
   actionButtons: {
     flexDirection: 'row',
@@ -252,12 +246,17 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: '#008a43',
     paddingVertical: 5,
-    paddingHorizontal: 15,
+    paddingHorizontal: 10,
     borderRadius: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 3,
   },
   buttonText: {
     color: '#fff',
-    fontSize: 14,
+    marginLeft: 5,
+    fontSize: 12,
   },
 });
 

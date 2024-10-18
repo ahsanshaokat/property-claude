@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   categoryGrid: {
-    paddingHorizontal: 5,
+    paddingHorizontal: 1,
   },
   categoryRow: {
     justifyContent: 'space-between',
@@ -166,8 +166,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flex: 1,
     borderRadius: 10,
-    padding: 10,
-    backgroundColor: '#f9f9f9',
+    padding: 5,
+    backgroundColor: '#fff',
     marginBottom: 15,
     borderColor: '#ddd',
     borderWidth: 1,

@@ -56,7 +56,7 @@ const HomeScreen = ({ navigation }) => {
 
   const handleSearch = () => {
     if (searchTerm) {
-      navigation.navigate('SearchResults', { searchTerm, cityId: selectedCity.id });
+      navigation.navigate('SearchResults', { searchTerm, purpose: selectedOption, cityId: selectedCity.id });
     }
   };
 
