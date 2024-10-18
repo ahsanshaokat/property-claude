@@ -2061,6 +2061,21 @@ eastasianwidth@^0.2.0:
 ee-first@1.1.1:
   version "1.1.1"
 
+"ekzameen-wp-app@file:":
+  version "1.0.0"
+  resolved "file:"
+  dependencies:
+    "@expo/metro-runtime" "~3.2.3"
+    ekzameen-wp-app "file:"
+    expo "~51.0.28"
+    expo-status-bar "~1.12.1"
+    react "18.2.0"
+    react-dom "18.2.0"
+    react-native "0.74.5"
+    react-native-splash-screen "^3.3.0"
+    react-native-web "~0.19.10"
+    react-native-webview "^13.12.3"
+
 electron-to-chromium@^1.5.28:
   version "1.5.41"
 
