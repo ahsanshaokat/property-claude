@@ -37,6 +37,11 @@ export class PropertyController {
     return this.propertyService.findAll(query);
   }
 
+  @Get()
+  findAll(@Query() query: QueryFilterPropertyDto) {
+    return this.propertyService.findAll(query);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.propertyService.findOneWithRelation(+id);

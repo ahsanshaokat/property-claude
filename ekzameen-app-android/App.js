@@ -14,6 +14,7 @@ import HomeScreen from './src/screens/HomeScreen';
 import PropertyDetailsScreen from './src/screens/PropertyDetailsScreen';
 import PostAdScreen from './src/screens/PostAdScreen';
 import PropertyTypesScreen from './src/screens/PropertyTypesScreen';
+import MyListingsScreen from './src/screens/MyListingsScreen';
 import SearchResultsScreen from './src/screens/SearchResultsScreen';
 import { AuthProvider } from './src/data/context/AuthContext'; // Import AuthContext
 import { AuthContext } from './src/data/context/AuthContext'; // Import the AuthContext
@@ -38,6 +39,7 @@ const MainStack = () => (
     <Stack.Screen name="PropertyTypes" component={PropertyTypesScreen} />
     <Stack.Screen name="Login" component={LoginScreen} />
     <Stack.Screen name="SignUp" component={SignUpScreen} />
+    <Stack.Screen name="MyListings" component={MyListingsScreen} />
     <Stack.Screen name="ForgotUsername" component={ForgotUsernameScreen} />
     <Stack.Screen name="SearchResults" component={SearchResultsScreen} options={{ headerShown: true }} />
   </Stack.Navigator>
@@ -117,10 +119,11 @@ const CustomDrawerContent = (props) => {
           <Text style={styles.drawerText}>Add Property</Text>
         </TouchableOpacity>
 
-        {/* <TouchableOpacity style={styles.drawerItem} onPress={() => props.navigation.navigate('SearchResults')}>
-          <Icon name="search" size={24} color="#fff" />
-          <Text style={styles.drawerText}>Search Properties</Text>
+        <TouchableOpacity style={styles.drawerItem} onPress={() => props.navigation.navigate('MyListings')}>
+          <Icon name="list" size={24} color="#fff" />
+          <Text style={styles.drawerText}>My Listings</Text>
         </TouchableOpacity>
+        {/* 
 
         <TouchableOpacity style={styles.drawerItem}>
           <Icon name="new-releases" size={24} color="#fff" />
