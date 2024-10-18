@@ -8,5 +8,5 @@ export class CreatePropertyTypeDto {
   alias: string;
 
   @IsNotEmpty()
-  parent_category: string;
+  parentCategory: string;
 }
