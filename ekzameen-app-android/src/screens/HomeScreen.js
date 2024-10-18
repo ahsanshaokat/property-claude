@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, FlatList, StyleSheet, TextInput, Image, TouchableOpacity, ActivityIndicator, TouchableWithoutFeedback, Linking, Alert } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons'; // For icons
-import { getProperties, getPropertyTypes, getCities } from '../data/api/propertyApi'; // Import the functions
-import { useFocusEffect } from '@react-navigation/native'; // To refetch data on focus
-import FontAwesome from 'react-native-vector-icons/FontAwesome'; // Import FontAwesome
+import { View, Text, FlatList, StyleSheet, TextInput, Image, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { getProperties, getCities } from '../data/api/propertyApi';
+import { useFocusEffect } from '@react-navigation/native';
+import PropertyCategory from '../components/home/PropertyCategory';
+import PropertyListing from '../components/home/PropertyListing';
 
 const HomeScreen = ({ navigation }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedOption, setSelectedOption] = useState('Buy'); // Buy or Rent (this will set the 'purpose')
+  const [selectedOption, setSelectedOption] = useState('Buy');
   const [properties, setProperties] = useState([]);
-  const [propertyTypes, setPropertyTypes] = useState([]);
   const [cities, setCities] = useState([]);
   const [selectedCity, setSelectedCity] = useState({ id: 14, name: 'Lahore' });
   const [cityDropdownOpen, setCityDropdownOpen] = useState(false);
@@ -17,50 +17,14 @@ const HomeScreen = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [page, setPage] = useState(1);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
+  const [activeCategory, setActiveCategory] = useState('Homes');
 
-  // Function to make a phone call
-  const handleCall = (phoneNumber) => {
-    const phoneUrl = `tel:${phoneNumber}`;
-    Linking.canOpenURL(phoneUrl)
-      .then((supported) => {
-        if (!supported) {
-          Alert.alert('Error', `Can't handle phone call`);
-        } else {
-          return Linking.openURL(phoneUrl);
-        }
-      })
-      .catch((err) => console.error('An error occurred', err));
-  };
+  useFocusEffect(
+    useCallback(() => {
+      fetchData(true);
+    }, [activeCategory, selectedOption])
+  );
 
-  // Function to send an SMS
-  const handleSMS = (phoneNumber) => {
-    const smsUrl = `sms:${phoneNumber}`;
-    Linking.canOpenURL(smsUrl)
-      .then((supported) => {
-        if (!supported) {
-          Alert.alert('Error', `Can't handle SMS`);
-        } else {
-          return Linking.openURL(smsUrl);
-        }
-      })
-      .catch((err) => console.error('An error occurred', err));
-  };
-
-  // Function to open WhatsApp
-  const handleWhatsApp = (phoneNumber) => {
-    const whatsappUrl = `whatsapp://send?phone=${phoneNumber}`;
-    Linking.canOpenURL(whatsappUrl)
-      .then((supported) => {
-        if (!supported) {
-          Alert.alert('Error', `WhatsApp is not installed on this device`);
-        } else {
-          return Linking.openURL(whatsappUrl);
-        }
-      })
-      .catch((err) => console.error('An error occurred', err));
-  };
-
-  // Function to fetch properties, property types, and cities
   const fetchData = async (resetPage = false) => {
     if (resetPage) {
       setLoading(true);
@@ -71,12 +35,10 @@ const HomeScreen = ({ navigation }) => {
 
     try {
       const propertyResponse = await getProperties(`?page=${resetPage ? 1 : page}&perPage=12&order[updated_at]=DESC`);
-      const typesResponse = await getPropertyTypes();
       const citiesResponse = await getCities();
 
-      if (propertyResponse.data.success && typesResponse && citiesResponse) {
+      if (propertyResponse.data.success && citiesResponse) {
         setProperties(resetPage ? propertyResponse.data.data : [...properties, ...propertyResponse.data.data]);
-        setPropertyTypes(typesResponse.data);
         setCities(citiesResponse.data);
       }
     } catch (error) {
@@ -87,66 +49,33 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
-  // Pull to refresh function
   const onRefresh = () => {
     setRefreshing(true);
     fetchData(true).then(() => setRefreshing(false));
   };
 
-  // Pagination function when user scrolls to the bottom
-  const onEndReached = () => {
-    if (!isFetchingMore) {
-      setPage(prevPage => prevPage + 1);
-      fetchData();
-    }
-  };
-
-  // Refetch data every time the screen is focused
-  useFocusEffect(
-    useCallback(() => {
-      fetchData(true);
-    }, [])
-  );
-
-  const handleAddProperty = () => {
-    navigation.navigate('PostAd');
-  };
-
-  // Function to handle search action
   const handleSearch = () => {
     if (searchTerm) {
       navigation.navigate('SearchResults', { searchTerm, cityId: selectedCity.id });
     }
   };
 
-  // Function to handle category click
-  const handleCategoryClick = (alias) => {
-    navigation.navigate('SearchResults', { 
-      propertyType: alias, 
-    });
-  };
-
-  // Function to close city dropdown when clicked outside
   const closeCityDropdown = () => {
     if (cityDropdownOpen) {
       setCityDropdownOpen(false);
     }
   };
 
-  // Render category item
-  const renderCategoryItem = ({ item }) => (
-    <TouchableOpacity onPress={() => handleCategoryClick(item.alias)} style={styles.categoryItem}>
-      {item.imageUrl.startsWith('http') ? (
-        <Image source={{ uri: item.imageUrl }} style={styles.categoryIcon} />
-      ) : (
-        <Text style={[styles.textIcon, { color: '#008a43' }]}>{item.imageUrl || '🏠'}</Text>
-      )}
-      <Text style={styles.categoryName}>{item.name}</Text>
-      <Text style={styles.categoryCount}>({item.propertyCount || 0})</Text>
-    </TouchableOpacity>
-  );
+  const loadMoreData = () => {
+    if (!isFetchingMore) {
+      setPage(prevPage => {
+        const nextPage = prevPage + 1;
+        fetchData();
+        return nextPage;
+      });
+    }
+  };
 
-  // Render cities dropdown
   const renderCityDropdown = () => (
     <View style={styles.cityDropdownContainer}>
       <TouchableOpacity style={styles.locationButton} onPress={() => setCityDropdownOpen(!cityDropdownOpen)}>
@@ -172,59 +101,11 @@ const HomeScreen = ({ navigation }) => {
     </View>
   );
 
-  // Render property item
-  const renderPropertyItem = ({ item }) => (
-    <TouchableOpacity onPress={() => navigation.navigate('PropertyDetails', { propertyId: item.id })}>
-      <View style={styles.propertyCard}>
-        <View style={[styles.propertyTag, item.purpose === 'SALE' ? styles.saleTag : styles.rentTag]}>
-          <Text style={styles.tagText}>{item.purpose}</Text>
-        </View>
-        <Image source={{ uri: item.propertyImages.length > 0 ? item.propertyImages[0].image_url : 'https://via.placeholder.com/150' }} style={styles.propertyImage} />
-        <View style={styles.propertyInfo}>
-          <Text style={styles.propertyTitle}>{item.name}</Text>
-          <Text style={styles.propertyLocation}>{item.address}</Text>
-          <View style={styles.propertyDetails}>
-            <View style={styles.propertyDetailItem}>
-              <Icon name="king-bed" size={18} color="#008a43" />
-              <Text style={styles.detailText}>{item.noOfBedRoom} Beds</Text>
-            </View>
-            <View style={styles.propertyDetailItem}>
-              <Icon name="bathtub" size={18} color="#008a43" />
-              <Text style={styles.detailText}>{item.noOfBathRoom} Baths</Text>
-            </View>
-            <View style={styles.propertyDetailItem}>
-              <Icon name="straighten" size={18} color="#008a43" />
-              <Text style={styles.detailText}>{item.propertySize} sq ft</Text>
-            </View>
-          </View>
-          <Text style={styles.propertyPrice}>Rs. {item.price}</Text>
-
-          {/* Buttons for Call, SMS, and WhatsApp */}
-          <View style={styles.contactButtons}>
-            <TouchableOpacity style={styles.contactButton} onPress={() => handleWhatsApp(item.additionalSpec)}>
-              <FontAwesome name="whatsapp" size={20} color="#fff" />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.contactButton} onPress={() => handleSMS(item.additionalSpec)}>
-              <Icon name="sms" size={20} color="#fff" />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.contactButton} onPress={() => handleCall(item.additionalSpec)}>
-              <Icon name="phone" size={20} color="#fff" />
-              <Text style={styles.contactButtonText}>Call</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
-
   return (
     <TouchableWithoutFeedback onPress={closeCityDropdown}>
       <View style={styles.container}>
         <FlatList
           data={properties}
-          renderItem={renderPropertyItem}
-          keyExtractor={(item) => item.id.toString()}
-          contentContainerStyle={styles.propertyList}
           ListHeaderComponent={
             <>
               <View style={styles.topSection}>
@@ -260,65 +141,43 @@ const HomeScreen = ({ navigation }) => {
                 </View>
               </View>
 
-              {/* Category Section with Label */}
+              <PropertyCategory 
+                setActiveCategory={setActiveCategory} 
+                onCategoryClick={(alias) => navigation.navigate('SearchResults', { propertyType: alias })} 
+              />
               <Text style={styles.sectionLabel}>Property Categories</Text>
-              {loading ? (
-                <ActivityIndicator size="large" color="#008a43" />
-              ) : (
-                <View style={styles.categoryContainer}>
-                  <FlatList
-                    data={propertyTypes}
-                    renderItem={renderCategoryItem}
-                    keyExtractor={(item) => item.id.toString()}
-                    numColumns={3}
-                    columnWrapperStyle={styles.categoryRow}
-                    contentContainerStyle={styles.categoryGrid}
-                  />
-                </View>
-              )}
-
-              {/* Property Listings Section Label */}
-              <Text style={styles.sectionLabel}>Property Listings</Text>
             </>
           }
+          renderItem={({ item }) => (
+            <PropertyListing
+              property={item}
+              onPropertyClick={(id) => navigation.navigate('PropertyDetails', { propertyId: id })}
+            />
+          )}
+          keyExtractor={(item) => item.id.toString()}
           onRefresh={onRefresh}
           refreshing={refreshing}
-          onEndReached={onEndReached}
+          onEndReached={loadMoreData}
           onEndReachedThreshold={0.5}
+          contentContainerStyle={{ paddingBottom: 20 }}
+          style={{ flexGrow: 1 }}
         />
-
-        {/* Floating Add Property Button */}
-        <TouchableOpacity
-          style={styles.floatingButton}
-          onPress={() => navigation.navigate('PostAd')}
-        >
-          <Text style={styles.floatingButtonText}>+</Text>
-        </TouchableOpacity>
       </View>
     </TouchableWithoutFeedback>
   );
 };
 
 const styles = StyleSheet.create({
-  categoryContainer: {zIndex: -1},
-  container: { flex: 1, backgroundColor: '#f2f2f2', zIndex: -1 },
-  scrollContainer: { paddingBottom: 100 },
-  floatingButton: {
-    backgroundColor: '#ffc107',
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    position: 'absolute',
-    bottom: 20,
-    right: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 100,
+  container: {
+    flex: 1,
+    backgroundColor: '#f2f2f2',
   },
-  floatingButtonText: {
-    color: '#000',
-    fontSize: 36,
+  sectionLabel: {
+    fontSize: 20,
     fontWeight: 'bold',
+    marginLeft: 15,
+    marginTop: 15,
+    marginBottom: 15,
   },
   topSection: {
     backgroundColor: '#008a43',
@@ -372,7 +231,6 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     width: '90%',
     elevation: 2,
-    position: 'relative',
   },
   searchBar: {
     flex: 1,
@@ -380,9 +238,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   searchButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 10, // Adjust padding for better spacing
+    paddingHorizontal: 10,
   },
   locationButton: {
     flexDirection: 'row',
@@ -414,137 +270,6 @@ const styles = StyleSheet.create({
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
-  },
-  categoryGrid: {
-    paddingHorizontal: 15,
-    zIndex: -33,
-  },
-  categoryRow: {
-    justifyContent: 'space-between',
-    marginBottom: 10,
-    zIndex: -4,
-  },
-  categoryItem: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-    borderRadius: 15,
-    padding: 10,
-    backgroundColor: '#f7f7f7',
-    marginBottom: 15,
-    zIndex: -1,
-  },
-  categoryIcon: {
-    width: 40,
-    height: 40,
-    marginBottom: 10,
-    zIndex: -1,
-    resizeMode: 'contain',
-  },
-  textIcon: {
-    fontSize: 40,
-    textAlign: 'center',
-  },
-  categoryCount: {
-    fontSize: 12,
-    color: '#666',
-    textAlign: 'center',
-  },
-  sectionLabel: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginLeft: 15,
-    marginTop: 15,
-    marginBottom: 15,
-  },
-  propertyList: { padding: 0 },
-  propertyCard: {
-    flexDirection: 'row',
-    padding: 15,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    marginBottom: 10,
-    elevation: 2,
-    position: 'relative',
-  },
-  propertyTag: {
-    backgroundColor: '#008a43',
-    borderRadius: 5,
-    paddingHorizontal: 5,
-    paddingVertical: 2,
-    position: 'absolute',
-    left: -15,
-    top: -5,
-    width: 50,
-  },
-  saleTag: {
-    backgroundColor: '#ffc107',
-  },
-  rentTag: {
-    backgroundColor: '#ff5733',
-  },
-  tagText: {
-    fontSize: 12,
-    color: '#fff',
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  propertyImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 10,
-    marginRight: 15,
-  },
-  propertyInfo: { flex: 1, justifyContent: 'center' },
-  propertyTitle: { fontSize: 18, fontWeight: 'bold' },
-  propertyLocation: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 5,
-  },
-  propertyDetails: {
-    flexDirection: 'row',
-    marginTop: 5,
-    marginBottom: 10,
-  },
-  propertyDetailItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginRight: 15,
-  },
-  detailText: {
-    fontSize: 14,
-    color: '#008a43',
-    marginLeft: 5,
-  },
-  propertyPrice: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#000',
-  },
-  contactButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center', // Aligns icons and text properly
-    marginTop: 10,
-    paddingHorizontal: 5, 
-    width: '100%', 
-  },
-  contactButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#008a43',
-    paddingVertical: 10, // Increase padding for better button height
-    borderRadius: 5,
-    justifyContent: 'center',
-    flex: 1,
-    marginHorizontal: 5, // Adds space between buttons
-  },
-  contactButtonText: {
-    color: '#fff',
-    marginLeft: 5,
-    fontWeight: 'bold',
-    fontSize: 14,
   },
 });
 

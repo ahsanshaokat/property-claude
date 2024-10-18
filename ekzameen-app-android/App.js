@@ -168,9 +168,10 @@ const Drawer = createDrawerNavigator();
 const App = () => {
   return (
     <AuthProvider>
-      <NavigationContainer>
+      <NavigationContainer  style={styles.outterContainer}>
         <Drawer.Navigator
           initialRouteName="Dashboard"
+          style={styles.outterContainer}
           drawerContent={(props) => <CustomDrawerContent {...props} />}
           screenOptions={{
             headerStyle: { backgroundColor: '#008a43' },  // Green theme color for header
@@ -183,7 +184,7 @@ const App = () => {
             headerTintColor: '#fff',  // Text and icons color set to white
           }}
         >
-          <Drawer.Screen name="Dashboard" component={MainStack} />
+          <Drawer.Screen name="Dashboard" style={styles.outterContainer} component={MainStack} />
         </Drawer.Navigator>
       </NavigationContainer>
     </AuthProvider>
@@ -194,10 +195,12 @@ export default App;
 
 // Styles for the drawer and header
 const styles = StyleSheet.create({
+  outterContainer: {overflow: 'scroll'},
   drawerContent: {
     flex: 1,
     padding: 20,
     backgroundColor: '#008a43',  // Green theme for drawer background
+    overflow: 'scroll'
   },
   drawerHeader: {
     alignItems: 'center',
@@ -258,6 +261,7 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     borderTopWidth: 1,
     borderTopColor: '#ccc',
+    overflow: 'scroll'
   },
   logo: {
     width: 180,
