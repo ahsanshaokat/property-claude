@@ -11,7 +11,7 @@ export class PropertyType extends BaseEntity {
   alias: string;
 
   @Column({ nullable: true })
-  parent_category: string;
+  parentCategory: string;
 
   @Column({ nullable: true })
   imageUrl: string;
