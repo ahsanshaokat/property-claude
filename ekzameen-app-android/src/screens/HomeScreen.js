@@ -118,13 +118,13 @@ const HomeScreen = ({ navigation }) => {
                     style={[styles.toggleButton, selectedOption === 'Buy' && styles.activeButton]}
                     onPress={() => setSelectedOption('Buy')}
                   >
-                    <Text style={[styles.toggleText, selectedOption === 'Buy' ? styles.activeToggleText : styles.inactiveToggleText]}>Buy</Text>
+                    <Text style={[styles.toggleText, selectedOption === 'Buy' && styles.activeToggleText]}>Buy</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={[styles.toggleButton, selectedOption === 'Rent' && styles.activeButton]}
                     onPress={() => setSelectedOption('Rent')}
                   >
-                    <Text style={[styles.toggleText, selectedOption === 'Rent' ? styles.activeToggleText : styles.inactiveToggleText]}>Rent</Text>
+                    <Text style={[styles.toggleText, selectedOption === 'Rent' && styles.activeToggleText]}>Rent</Text>
                   </TouchableOpacity>
                 </View>
                 <View style={styles.searchContainer}>
@@ -196,28 +196,30 @@ const styles = StyleSheet.create({
   },
   toggleContainer: {
     flexDirection: 'row',
+    justifyContent: 'center',
+    marginVertical: 15,
     backgroundColor: '#fff',
     borderRadius: 20,
-    padding: 4,
-    marginBottom: 15,
+    padding: 3,
+    width: '50%',
   },
   toggleButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 40,
+    flex: 1,
+    paddingVertical: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 20,
   },
   activeButton: {
     backgroundColor: '#008a43',
   },
   toggleText: {
-    fontSize: 16,
+    fontSize: 14,
+    color: '#333',
   },
   activeToggleText: {
     color: '#fff',
     fontWeight: 'bold',
-  },
-  inactiveToggleText: {
-    color: '#008a43',
   },
   searchContainer: {
     flexDirection: 'row',

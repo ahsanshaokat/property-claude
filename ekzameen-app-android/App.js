@@ -264,9 +264,9 @@ const styles = StyleSheet.create({
     overflow: 'scroll'
   },
   logo: {
-    width: 180,
+    width: 130,
     alignContent: 'center',
-    height: 40,
+    height: 30,
     resizeMode: 'contain',
   },
 });
