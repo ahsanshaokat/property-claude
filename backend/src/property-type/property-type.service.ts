@@ -67,6 +67,7 @@ export class PropertyTypeService {
         'propertyType.name',
         'propertyType.alias',
         'propertyType.imageUrl',
+        'propertyType.parentCategory',
       ])
       .loadRelationCountAndMap(
         'propertyType.propertyCount',
