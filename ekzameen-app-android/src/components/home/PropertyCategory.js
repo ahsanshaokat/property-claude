@@ -71,12 +71,12 @@ const PropertyCategory = ({ onCategoryClick }) => {
             </TouchableOpacity>
           ))}
         </View>
-        <View style={styles.subTabsContainer}>
+        {/* <View style={styles.subTabsContainer}>
           <Text style={styles.subTab}>Popular</Text>
           <Text style={styles.subTab}>Type</Text>
           <Text style={styles.subTab}>Location</Text>
           <Text style={styles.subTab}>Area Size</Text>
-        </View>
+        </View> */}
         <View style={styles.categoryGrid}>
           <FlatList
             data={propertyTypes}

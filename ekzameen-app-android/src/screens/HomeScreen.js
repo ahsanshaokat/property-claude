@@ -113,6 +113,18 @@ const HomeScreen = ({ navigation }) => {
                   source={{ uri: 'https://ekzameen.com/_next/static/media/headerbg.42b8ac70.png' }}
                   style={styles.backgroundImage}
                 />
+                <View style={styles.searchContainer}>
+                  <TextInput
+                    placeholder="Search for properties..."
+                    style={styles.searchBar}
+                    value={searchTerm}
+                    onChangeText={setSearchTerm}
+                  />
+                  {renderCityDropdown()}
+                  <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
+                    <Icon name="search" size={20} color="#000" />
+                  </TouchableOpacity>
+                </View>
                 <View style={styles.toggleContainer}>
                   <TouchableOpacity
                     style={[styles.toggleButton, selectedOption === 'Buy' && styles.activeButton]}
@@ -125,18 +137,6 @@ const HomeScreen = ({ navigation }) => {
                     onPress={() => setSelectedOption('Rent')}
                   >
                     <Text style={[styles.toggleText, selectedOption === 'Rent' && styles.activeToggleText]}>Rent</Text>
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.searchContainer}>
-                  <TextInput
-                    placeholder="Search for properties..."
-                    style={styles.searchBar}
-                    value={searchTerm}
-                    onChangeText={setSearchTerm}
-                  />
-                  {renderCityDropdown()}
-                  <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
-                    <Icon name="search" size={20} color="#000" />
                   </TouchableOpacity>
                 </View>
               </View>
