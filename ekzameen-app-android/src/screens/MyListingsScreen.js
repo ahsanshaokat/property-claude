@@ -173,6 +173,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f2f2f2',
   },
+  contactButtonText: {
+    color: '#fff',
+    marginLeft: 5,
+    fontWeight: 'bold',
+    fontSize: 12,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
