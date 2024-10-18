@@ -162,6 +162,14 @@ const HomeScreen = ({ navigation }) => {
           contentContainerStyle={{ paddingBottom: 20 }}
           style={{ flexGrow: 1 }}
         />
+
+        {/* Floating Add Post Button */}
+        <TouchableOpacity
+          style={styles.floatingButton}
+          onPress={() => navigation.navigate('PostAd')}
+        >
+          <Icon name="add" size={30} color="#fff" />
+        </TouchableOpacity>
       </View>
     </TouchableWithoutFeedback>
   );
@@ -272,6 +280,22 @@ const styles = StyleSheet.create({
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
+  },
+  floatingButton: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    backgroundColor: '#008a43',
+    borderRadius: 50,
+    width: 60,
+    height: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 5,
   },
 });
 
