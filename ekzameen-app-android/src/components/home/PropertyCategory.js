@@ -94,6 +94,7 @@ const PropertyCategory = ({ onCategoryClick }) => {
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
+    zIndex: -1,
     marginTop: 10,
     justifyContent: 'center',
     alignItems: 'center',
