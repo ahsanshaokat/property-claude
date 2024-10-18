@@ -29,6 +29,7 @@ export class PropertyTypeService {
       select: {
         id: true,
         name: true,
+        parent_category: true,
         properties: {
           id: true,
           name: true,

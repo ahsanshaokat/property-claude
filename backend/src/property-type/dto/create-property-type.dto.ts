@@ -6,4 +6,7 @@ export class CreatePropertyTypeDto {
 
   @IsNotEmpty()
   alias: string;
+
+  @IsNotEmpty()
+  parent_category: string;
 }

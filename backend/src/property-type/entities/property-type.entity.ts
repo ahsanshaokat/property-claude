@@ -11,6 +11,9 @@ export class PropertyType extends BaseEntity {
   alias: string;
 
   @Column({ nullable: true })
+  parent_category: string;
+
+  @Column({ nullable: true })
   imageUrl: string;
 
   @OneToMany(() => Property, (property) => property.propertyType, {
