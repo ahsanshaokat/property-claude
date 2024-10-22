@@ -251,6 +251,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 20,
     padding: 3,
+    zIndex: -1,
     width: '50%',
   },
   toggleButton: {
