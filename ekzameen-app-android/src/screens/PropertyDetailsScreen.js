@@ -197,6 +197,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     padding: 8,
     height: 48,
+    width: 48,
     borderRadius: 20,
   },
   carouselContainer: { position: 'relative' },
