@@ -6,6 +6,7 @@ export default function Document() {
     <Html lang="en">
       <Head>
         <meta name="description" content="Ekzameen.com is your go-to platform for buying, selling, or renting real estate properties. Discover your dream home or perfect investment today!" />
+        
       </Head>
       <body>
         <Main />
