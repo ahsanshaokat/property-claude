@@ -1,8 +1,8 @@
 import 'react-native-gesture-handler';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useCallback } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { createDrawerNavigator, DrawerContentScrollView } from '@react-navigation/drawer';
+import { createDrawerNavigator, DrawerContentScrollView, useDrawerStatus } from '@react-navigation/drawer';
 import { View, Text, TouchableOpacity, StyleSheet, Image, Linking } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -44,20 +44,26 @@ const MainStack = () => (
 const CustomDrawerContent = (props) => {
   const { logoutUser } = useContext(AuthContext);
   const [user, setUser] = useState(null);
+  const isDrawerOpen = useDrawerStatus() === 'open';
+
+  const fetchUser = useCallback(async () => {
+    try {
+      const userData = await AsyncStorage.getItem('user');
+      if (userData) {
+        setUser(JSON.parse(userData));
+      } else {
+        setUser(null);
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const userData = await AsyncStorage.getItem('user');
-        if (userData) {
-          setUser(JSON.parse(userData));
-        }
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-      }
-    };
-    fetchUser();
-  }, []);
+    if (isDrawerOpen) {
+      fetchUser();
+    }
+  }, [isDrawerOpen, fetchUser]);
 
   const handleLogout = async () => {
     try {
@@ -171,7 +177,7 @@ const App = () => (
               onPress={() => navigation.openDrawer()}
               style={{ marginLeft: 16, width: 48, height: 48, justifyContent: 'center', alignItems: 'center' }}
             >
-              <Icon name="menu" size={28} color="#ffffff" /> {/* Set the icon size to 28px */}
+              <Icon name="menu" size={28} color="#ffffff" />
             </TouchableOpacity>
           ),
           headerTitle: () => (
