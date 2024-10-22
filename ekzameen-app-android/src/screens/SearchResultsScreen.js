@@ -38,6 +38,9 @@ const SearchResultsScreen = ({ route }) => {
           cityId,
           purpose,
         },
+        order: {
+          created_at: 'DESC'
+        }
       };
 
       const response = await getPropertiesByFilter(filterObject);
