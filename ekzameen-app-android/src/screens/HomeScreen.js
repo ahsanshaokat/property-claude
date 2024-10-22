@@ -242,6 +242,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 100,
+    zIndex: -2,
     opacity: 1,
   },
   toggleContainer: {
