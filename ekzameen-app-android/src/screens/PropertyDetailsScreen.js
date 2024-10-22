@@ -51,7 +51,7 @@ const PropertyDetailsScreen = ({ route }) => {
       const value = price / 100000;
       return value === 1 ? `${value} Lac` : `${value.toFixed(1)} Lacs`;
     }
-    return price.toLocaleString();
+    return price;
   };
 
   // Convert square footage to Marla, Kanal, or Acres
@@ -143,15 +143,15 @@ const PropertyDetailsScreen = ({ route }) => {
 
         <View style={styles.propertyDetails}>
           <View style={styles.detailItem}>
-            <Icon name="king-bed" size={18} color="#008a43" />
+            <Icon name="king-bed" size={18} color="#006b3c" />
             <Text style={styles.detailText}>{property.noOfBedRoom} Beds</Text>
           </View>
           <View style={styles.detailItem}>
-            <Icon name="bathtub" size={18} color="#008a43" />
+            <Icon name="bathtub" size={18} color="#006b3c" />
             <Text style={styles.detailText}>{property.noOfBathRoom} Baths</Text>
           </View>
           <View style={styles.detailItem}>
-            <Icon name="straighten" size={18} color="#008a43" />
+            <Icon name="straighten" size={18} color="#006b3c" />
             <Text style={styles.detailText}>{convertSize(property.propertySize)}</Text>
           </View>
         </View>
@@ -196,6 +196,7 @@ const styles = StyleSheet.create({
     left: 20,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     padding: 8,
+    height: 48,
     borderRadius: 20,
   },
   carouselContainer: { position: 'relative' },
@@ -211,7 +212,7 @@ const styles = StyleSheet.create({
   },
   infoContainer: { padding: 16 },
   propertyTitle: { fontSize: 22, fontWeight: 'bold', marginBottom: 10 },
-  propertyPrice: { fontSize: 24, fontWeight: 'bold', color: '#008a43', marginBottom: 5 },
+  propertyPrice: { fontSize: 24, fontWeight: 'bold', color: '#006b3c', marginBottom: 5 },
   propertyLocation: { fontSize: 16, color: '#666', marginBottom: 15 },
   postedTime: { fontSize: 14, color: '#888', marginBottom: 10 },
   propertyDetails: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 },
@@ -222,7 +223,7 @@ const styles = StyleSheet.create({
   featuresTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 10 },
   featureItem: { fontSize: 16, color: '#555', marginLeft: 10, marginBottom: 5 },
   bottomButtons: { flexDirection: 'row', justifyContent: 'space-around', padding: 10, backgroundColor: '#fff' },
-  button: { backgroundColor: '#008a43', paddingVertical: 10, paddingHorizontal: 25, borderRadius: 5 },
+  button: { backgroundColor: '#006b3c', paddingVertical: 10, paddingHorizontal: 25, borderRadius: 5 },
   buttonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
 });
 

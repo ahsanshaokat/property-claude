@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   topSection: {
-    backgroundColor: '#008a43',
+    backgroundColor: '#006b3c',
     paddingVertical: 20,
     paddingHorizontal: 15,
     alignItems: 'center',
@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   activeButton: {
-    backgroundColor: '#008a43',
+    backgroundColor: '#006b3c',
   },
   toggleText: {
     fontSize: 14,
@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
   },
   locationText: {
     marginRight: 5,
-    color: '#008a43',
+    color: '#006b3c',
     fontSize: 16,
   },
   cityDropdownContainer: {
@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 20,
     right: 20,
-    backgroundColor: '#008a43',
+    backgroundColor: '#006b3c',
     borderRadius: 50,
     width: 60,
     height: 60,

@@ -3,9 +3,9 @@ import React, { useContext, useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createDrawerNavigator, DrawerContentScrollView } from '@react-navigation/drawer';
-import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // For storing and retrieving user tokens
-import Icon from 'react-native-vector-icons/MaterialIcons';  // Icon library
+import { View, Text, TouchableOpacity, StyleSheet, Image, Linking } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import LoginScreen from './src/screens/LoginScreen';
 import SignUpScreen from './src/screens/SignUpScreen';
@@ -16,22 +16,18 @@ import PostAdScreen from './src/screens/PostAdScreen';
 import PropertyTypesScreen from './src/screens/PropertyTypesScreen';
 import MyListingsScreen from './src/screens/MyListingsScreen';
 import SearchResultsScreen from './src/screens/SearchResultsScreen';
-import { AuthProvider } from './src/data/context/AuthContext'; // Import AuthContext
-import { AuthContext } from './src/data/context/AuthContext'; // Import the AuthContext
+import { AuthProvider } from './src/data/context/AuthContext';
+import { AuthContext } from './src/data/context/AuthContext';
 
-
-// Enable react-native-screens for better performance
 import { enableScreens } from 'react-native-screens';
 enableScreens();
 
-// Create Stack Navigator for individual screens
 const Stack = createStackNavigator();
 
-// Stack Navigator containing Home, PropertyDetails, and PostAd screens
 const MainStack = () => (
   <Stack.Navigator
     initialRouteName="Home"
-    screenOptions={{ headerShown: false }}  // This removes the "Home" header from the stack
+    screenOptions={{ headerShown: false }}
   >
     <Stack.Screen name="Home" component={HomeScreen} />
     <Stack.Screen name="PropertyDetails" component={PropertyDetailsScreen} />
@@ -45,15 +41,13 @@ const MainStack = () => (
   </Stack.Navigator>
 );
 
-// Custom Drawer Content with Sign Out button and user check
 const CustomDrawerContent = (props) => {
-  const { logoutUser } = useContext(AuthContext); // Get user and logout from context
-  const [user, setUser] = useState(null); // User state
+  const { logoutUser } = useContext(AuthContext);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        // Check if user information is stored in AsyncStorage
         const userData = await AsyncStorage.getItem('user');
         if (userData) {
           setUser(JSON.parse(userData));
@@ -65,98 +59,95 @@ const CustomDrawerContent = (props) => {
     fetchUser();
   }, []);
 
-  // Logout Function
   const handleLogout = async () => {
     try {
-      // Clear the user session or token from AsyncStorage
       await AsyncStorage.removeItem('user');
       await AsyncStorage.removeItem('accessToken');
-
-      // Perform any additional cleanup if needed
-      logoutUser(); // Clear any auth context-related states
-
-      // Navigate to the login screen
+      logoutUser();
       props.navigation.navigate('Login');
     } catch (error) {
       console.error('Error during logout:', error);
     }
   };
 
+  const handleOpenAboutUs = () => {
+    Linking.openURL('https://ekzameen.com');
+  };
+
   return (
     <DrawerContentScrollView {...props}>
-    <View style={styles.drawerContent}>
-      {/* Header with Logo */}
-      <View style={styles.drawerHeader}>
-        <Image
-          source={{ uri: 'https://ekzameen.com/images/vertical_full_white.png' }}
-          style={styles.drawerLogo}
-        />
-      </View>
-
-      {/* User Info or Login Button */}
-      {!user ? (
-        <TouchableOpacity
-          style={styles.loginButton}
-          onPress={() => props.navigation.navigate('Login')}
-        >
-          <Text style={styles.loginButtonText}>Login or Create Account</Text>
-        </TouchableOpacity>
-      ) : (
-        <View style={styles.userInfo}>
-          <Text style={styles.userName}>{`${user.firstName} ${user.lastName}`}</Text>
-          <Text style={styles.userPhone}>{user.phone}</Text>
+      <View style={styles.drawerContent}>
+        <View style={styles.drawerHeader}>
+          <Image
+            source={{ uri: 'https://ekzameen.com/images/vertical_full_white.png' }}
+            style={styles.drawerLogo}
+          />
         </View>
-      )}
 
-      {/* Drawer Items */}
-      <TouchableOpacity style={styles.drawerItem} onPress={() => props.navigation.navigate('Home')}>
-        <Icon name="home" size={24} color="#fff" />
-        <Text style={styles.drawerText}>Home</Text>
-      </TouchableOpacity>
+        {!user ? (
+          <TouchableOpacity
+            style={styles.loginButton}
+            onPress={() => props.navigation.navigate('Login')}
+            accessibilityLabel="Login or Create Account"
+            accessibilityHint="Navigate to login or create a new account"
+          >
+            <Text style={styles.loginButtonText}>Login or Create Account</Text>
+          </TouchableOpacity>
+        ) : (
+          <View style={styles.userInfo}>
+            <Text style={styles.userName}>{`${user.firstName} ${user.lastName}`}</Text>
+            <Text style={styles.userPhone}>{user.phone}</Text>
+          </View>
+        )}
 
-        <TouchableOpacity style={styles.drawerItem} onPress={() => props.navigation.navigate('PostAd')}>
-          <Icon name="add-circle-outline" size={24} color="#fff" />
+        <TouchableOpacity 
+          style={styles.drawerItem} 
+          onPress={() => props.navigation.navigate('Home')}
+          accessibilityLabel="Navigate to Home"
+          accessibilityHint="Go back to the home screen"
+        >
+          <Icon name="home" size={24} color="#ffffff" />
+          <Text style={styles.drawerText}>Home</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.drawerItem} 
+          onPress={() => props.navigation.navigate('PostAd')}
+          accessibilityLabel="Add Property"
+          accessibilityHint="Navigate to add a new property listing"
+        >
+          <Icon name="add-circle-outline" size={24} color="#ffffff" />
           <Text style={styles.drawerText}>Add Property</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.drawerItem} onPress={() => props.navigation.navigate('MyListings')}>
-          <Icon name="list" size={24} color="#fff" />
+        <TouchableOpacity 
+          style={styles.drawerItem} 
+          onPress={() => props.navigation.navigate('MyListings')}
+          accessibilityLabel="My Listings"
+          accessibilityHint="View your property listings"
+        >
+          <Icon name="list" size={24} color="#ffffff" />
           <Text style={styles.drawerText}>My Listings</Text>
         </TouchableOpacity>
-        {/* 
 
-        <TouchableOpacity style={styles.drawerItem}>
-          <Icon name="new-releases" size={24} color="#fff" />
-          <Text style={styles.drawerText}>New Projects</Text>
+        <TouchableOpacity 
+          style={styles.drawerItem}
+          onPress={handleOpenAboutUs}
+          accessibilityLabel="About Us"
+          accessibilityHint="Learn more about the application"
+        >
+          <Icon name="info" size={24} color="#ffffff" />
+          <Text style={styles.drawerText}>About Us</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.drawerItem}>
-          <Icon name="favorite" size={24} color="#fff" />
-          <Text style={styles.drawerText}>Favorites</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.drawerItem}>
-          <Icon name="bookmark" size={24} color="#fff" />
-          <Text style={styles.drawerText}>Saved Searches</Text>
-        </TouchableOpacity> */}
-
-        {/* Language & About Us Section */}
-        <View style={styles.appControls}>
-          <TouchableOpacity style={styles.drawerItem}>
-            <Icon name="language" size={24} color="#fff" />
-            <Text style={styles.drawerText}>اردو</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.drawerItem}>
-            <Icon name="info" size={24} color="#fff" />
-            <Text style={styles.drawerText}>About Us</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Sign Out Button at the bottom */}
         {user && (
-          <TouchableOpacity style={styles.signOutButton} onPress={handleLogout}>
-            <Icon name="logout" size={24} color="#fff" />
+          <TouchableOpacity 
+            style={styles.signOutButton} 
+            onPress={handleLogout}
+            accessibilityLabel="Sign Out"
+            accessibilityHint="Sign out of your account"
+          >
+            <Icon name="logout" size={24} color="#ffffff" />
             <Text style={styles.drawerText}>Sign Out</Text>
           </TouchableOpacity>
         )}
@@ -165,45 +156,46 @@ const CustomDrawerContent = (props) => {
   );
 };
 
-// Create Drawer Navigator (Sidebar)
 const Drawer = createDrawerNavigator();
 
-const App = () => {
-  return (
-    <AuthProvider>
-      <NavigationContainer  style={styles.outterContainer}>
-        <Drawer.Navigator
-          initialRouteName="Dashboard"
-          style={styles.outterContainer}
-          drawerContent={(props) => <CustomDrawerContent {...props} />}
-          screenOptions={{
-            headerStyle: { backgroundColor: '#008a43' },  // Green theme color for header
-            headerTitle: () => (
-              <Image
-                source={{ uri: 'https://ekzameen.com/images/vertical_full_white.png' }}  // Green theme logo URL
-                style={styles.logo}
-              />
-            ),
-            headerTintColor: '#fff',  // Text and icons color set to white
-          }}
-        >
-          <Drawer.Screen name="Dashboard" style={styles.outterContainer} component={MainStack} />
-        </Drawer.Navigator>
-      </NavigationContainer>
-    </AuthProvider>
-  );
-};
+const App = () => (
+  <AuthProvider>
+    <NavigationContainer>
+      <Drawer.Navigator
+        initialRouteName="Dashboard"
+        drawerContent={(props) => <CustomDrawerContent {...props} />}
+        screenOptions={({ navigation }) => ({
+          headerStyle: { backgroundColor: '#006b3c' },
+          headerLeft: () => (
+            <TouchableOpacity
+              onPress={() => navigation.openDrawer()}
+              style={{ marginLeft: 16, width: 48, height: 48, justifyContent: 'center', alignItems: 'center' }}
+            >
+              <Icon name="menu" size={28} color="#ffffff" /> {/* Set the icon size to 28px */}
+            </TouchableOpacity>
+          ),
+          headerTitle: () => (
+            <Image
+              source={{ uri: 'https://ekzameen.com/images/vertical_full_white.png' }}
+              style={styles.logo}
+            />
+          ),
+          headerTintColor: '#ffffff',
+        })}
+      >
+        <Drawer.Screen name="Dashboard" component={MainStack} />
+      </Drawer.Navigator>
+    </NavigationContainer>
+  </AuthProvider>
+);
 
 export default App;
 
-// Styles for the drawer and header
 const styles = StyleSheet.create({
-  outterContainer: {overflow: 'scroll'},
   drawerContent: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#008a43',  // Green theme for drawer background
-    overflow: 'scroll'
+    backgroundColor: '#006b3c',
   },
   drawerHeader: {
     alignItems: 'center',
@@ -219,25 +211,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   userName: {
-    color: '#fff',
+    color: '#ffffff',
     fontSize: 18,
     fontWeight: 'bold',
   },
   userPhone: {
-    color: '#fff',
+    color: '#ffffff',
     fontSize: 16,
   },
   loginButton: {
     marginTop: 10,
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    backgroundColor: '#fff',
-    borderColor: '#008a43',
+    minHeight: 48,
+    paddingHorizontal: 18,
+    justifyContent: 'center',
+    backgroundColor: '#ffffff',
+    borderColor: '#006b3c',
     borderWidth: 1,
     borderRadius: 5,
   },
   loginButtonText: {
-    color: '#008a43',
+    color: '#006b3c',
     fontSize: 16,
     fontWeight: 'bold',
   },
@@ -245,31 +238,25 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 15,
+    minHeight: 48,
   },
   drawerText: {
     fontSize: 18,
     marginLeft: 15,
-    color: '#fff',  // White text color for drawer items
+    color: '#ffffff',
   },
   signOutButton: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 15,
-    marginTop: 'auto', // Align to bottom
+    marginTop: 'auto',
     borderTopWidth: 1,
-    borderTopColor: '#ccc',
-  },
-  appControls: {
-    marginTop: 20,
-    paddingTop: 20,
-    borderTopWidth: 1,
-    borderTopColor: '#ccc',
-    overflow: 'scroll'
+    borderTopColor: '#cccccc',
+    minHeight: 48,
   },
   logo: {
-    width: 130,
-    alignContent: 'center',
-    height: 30,
+    width: 150,
+    height: 48,
     resizeMode: 'contain',
   },
 });

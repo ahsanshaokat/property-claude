@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   activeButton: {
-    backgroundColor: '#008a43',
+    backgroundColor: '#006b3c',
   },
   activeButtonText: {
     color: '#fff',

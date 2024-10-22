@@ -1,8 +1,10 @@
 /* eslint-disable react/prop-types */
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, ScrollView, Picker, ActivityIndicator, Alert } from 'react-native';
-import { getPropertyTypes, getCities, getFeatures, createProperty, uploadImage } from '../data/api/propertyApi'; // Assuming these are defined
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
+import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Alert } from 'react-native';
+import { getPropertyTypes, getCities, getFeatures, createProperty, uploadImage } from '../data/api/propertyApi';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Picker } from '@react-native-picker/picker';
+
 
 const PostAdScreen = ({ navigation }) => {
   const [purpose, setPurpose] = useState('SALE');
@@ -147,7 +149,7 @@ const PostAdScreen = ({ navigation }) => {
       <Text style={styles.header}>Post an Ad</Text>
       
       {loading ? (
-        <ActivityIndicator size="large" color="#008a43" />
+        <ActivityIndicator size="large" color="#006b3c" />
       ) : (
         <>
           {/* Purpose */}
@@ -156,12 +158,16 @@ const PostAdScreen = ({ navigation }) => {
             <View style={styles.toggleRow}>
               <TouchableOpacity 
                 style={[styles.toggleButton, purpose === 'SALE' && styles.activeButton]} 
-                onPress={() => setPurpose('SALE')}>
+                onPress={() => setPurpose('SALE')}
+                accessibilityLabel="Select Sell Purpose"
+                accessibilityHint="Tap to select selling as the purpose">
                 <Text style={purpose === 'SALE' ? styles.activeButtonText : styles.inactiveButtonText}>Sell</Text>
               </TouchableOpacity>
               <TouchableOpacity 
                 style={[styles.toggleButton, purpose === 'RENT' && styles.activeButton]} 
-                onPress={() => setPurpose('RENT')}>
+                onPress={() => setPurpose('RENT')}
+                accessibilityLabel="Select Rent Purpose"
+                accessibilityHint="Tap to select renting out as the purpose">
                 <Text style={purpose === 'RENT' ? styles.activeButtonText : styles.inactiveButtonText}>Rent Out</Text>
               </TouchableOpacity>
             </View>
@@ -174,7 +180,8 @@ const PostAdScreen = ({ navigation }) => {
               selectedValue={propertyType}
               onValueChange={(itemValue) => setPropertyType(itemValue)}
               style={styles.picker}
-            >
+              accessibilityLabel="Property Type Selector"
+              accessibilityHint="Select the type of property">
               {propertyTypes.map((type) => (
                 <Picker.Item key={type.id} label={type.name} value={type.id} />
               ))}
@@ -188,7 +195,8 @@ const PostAdScreen = ({ navigation }) => {
               selectedValue={city}
               onValueChange={(itemValue) => setCity(itemValue)}
               style={styles.picker}
-            >
+              accessibilityLabel="City Selector"
+              accessibilityHint="Select the city of the property">
               {cities.map((city) => (
                 <Picker.Item key={city.id} label={city.name} value={city.id} />
               ))}
@@ -203,7 +211,8 @@ const PostAdScreen = ({ navigation }) => {
               value={title}
               onChangeText={setTitle}
               placeholder="Enter property title" 
-            />
+              accessibilityLabel="Property Title Input"
+              accessibilityHint="Enter the title for your property listing"/>
           </View>
 
           <View style={styles.section}>
@@ -214,10 +223,11 @@ const PostAdScreen = ({ navigation }) => {
               onChangeText={setDescription}
               placeholder="Enter property description" 
               multiline
-            />
+              accessibilityLabel="Property Description Input"
+              accessibilityHint="Enter a detailed description for your property listing"/>
           </View>
 
-          {/* Area Size, Price, Bedrooms, Bathrooms, Address, Total Floors, Year Built */}
+          {/* Other Fields */}
           <View style={styles.section}>
             <Text style={styles.sectionHeader}>Area Size (Sq. Ft.)</Text>
             <TextInput 
@@ -226,7 +236,8 @@ const PostAdScreen = ({ navigation }) => {
               onChangeText={setPropertySize}
               placeholder="Enter area size" 
               keyboardType="numeric"
-            />
+              accessibilityLabel="Area Size Input"
+              accessibilityHint="Enter the size of the property in square feet"/>
           </View>
 
           <View style={styles.section}>
@@ -237,7 +248,8 @@ const PostAdScreen = ({ navigation }) => {
               onChangeText={setPrice}
               placeholder="Enter price" 
               keyboardType="numeric"
-            />
+              accessibilityLabel="Price Input"
+              accessibilityHint="Enter the total price for the property"/>
           </View>
 
           <View style={styles.section}>
@@ -248,7 +260,8 @@ const PostAdScreen = ({ navigation }) => {
               onChangeText={(val) => setBedrooms(parseInt(val))}
               placeholder="Enter number of bedrooms" 
               keyboardType="numeric"
-            />
+              accessibilityLabel="Bedrooms Input"
+              accessibilityHint="Enter the number of bedrooms"/>
           </View>
 
           <View style={styles.section}>
@@ -259,7 +272,8 @@ const PostAdScreen = ({ navigation }) => {
               onChangeText={(val) => setBathrooms(parseInt(val))}
               placeholder="Enter number of bathrooms" 
               keyboardType="numeric"
-            />
+              accessibilityLabel="Bathrooms Input"
+              accessibilityHint="Enter the number of bathrooms"/>
           </View>
 
           <View style={styles.section}>
@@ -269,7 +283,8 @@ const PostAdScreen = ({ navigation }) => {
               value={address}
               onChangeText={setAddress}
               placeholder="Enter address" 
-            />
+              accessibilityLabel="Address Input"
+              accessibilityHint="Enter the address of the property"/>
           </View>
 
           <View style={styles.section}>
@@ -280,7 +295,8 @@ const PostAdScreen = ({ navigation }) => {
               onChangeText={setYearBuild}
               placeholder="Enter year built" 
               keyboardType="numeric"
-            />
+              accessibilityLabel="Year Built Input"
+              accessibilityHint="Enter the year the property was built"/>
           </View>
 
           <View style={styles.section}>
@@ -291,7 +307,8 @@ const PostAdScreen = ({ navigation }) => {
               onChangeText={setTotalFloors}
               placeholder="Enter total floors" 
               keyboardType="numeric"
-            />
+              accessibilityLabel="Total Floors Input"
+              accessibilityHint="Enter the total number of floors"/>
           </View>
 
           <View style={styles.section}>
@@ -302,7 +319,8 @@ const PostAdScreen = ({ navigation }) => {
               onChangeText={setContactNumber}
               placeholder="Enter contact number" 
               keyboardType="phone-pad"
-            />
+              accessibilityLabel="Contact Number Input"
+              accessibilityHint="Enter the contact number for inquiries"/>
           </View>
 
           {/* Features */}
@@ -317,7 +335,8 @@ const PostAdScreen = ({ navigation }) => {
                     selectedFeatures.includes(feature.id) && styles.selectedFeatureButton
                   ]}
                   onPress={() => toggleFeature(feature.id)}
-                >
+                  accessibilityLabel={`Toggle ${feature.name}`}
+                  accessibilityHint={`Select or unselect ${feature.name}`}>
                   <Text
                     style={[
                       styles.featureText,
@@ -338,7 +357,8 @@ const PostAdScreen = ({ navigation }) => {
               <TouchableOpacity
                 style={[styles.toggleButton, imageType === 'feature' && styles.activeButton]}
                 onPress={() => setImageType('feature')}
-              >
+                accessibilityLabel="Feature Image Upload"
+                accessibilityHint="Select to upload a feature image">
                 <Text style={imageType === 'feature' ? styles.activeButtonText : styles.inactiveButtonText}>
                   Feature Image
                 </Text>
@@ -346,7 +366,8 @@ const PostAdScreen = ({ navigation }) => {
               <TouchableOpacity
                 style={[styles.toggleButton, imageType === 'header' && styles.activeButton]}
                 onPress={() => setImageType('header')}
-              >
+                accessibilityLabel="Header Image Upload"
+                accessibilityHint="Select to upload a header image">
                 <Text style={imageType === 'header' ? styles.activeButtonText : styles.inactiveButtonText}>
                   Header Image
                 </Text>
@@ -358,13 +379,20 @@ const PostAdScreen = ({ navigation }) => {
             {/* Display uploaded images */}
             <View style={styles.uploadedImages}>
               {imageFiles.map((file, index) => (
-                <Text key={index}>{file.fileName}</Text>
+                <Text key={index} accessibilityLabel={`Uploaded image ${index + 1}`}>{file.fileName}</Text>
               ))}
             </View>
           </View>
 
           {/* Post Ad Button */}
-          <Button title="Post Ad" onPress={handlePostAd} />
+          <TouchableOpacity
+              style={styles.postAdButton}
+              onPress={handlePostAd}
+              accessibilityLabel="Post Ad Button"
+              accessibilityHint="Tap to post your ad"
+            >
+              <Text style={styles.buttonText}>POST AD</Text>
+            </TouchableOpacity>
         </>
       )}
     </ScrollView>
@@ -401,9 +429,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ddd',
     alignItems: 'center',
+    minHeight: 48,
   },
   activeButton: {
-    backgroundColor: '#008a43',
+    backgroundColor: '#006b3c',
   },
   activeButtonText: {
     color: '#fff',
@@ -417,26 +446,29 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
     borderColor: '#ddd',
+    minHeight: 48,
   },
   picker: {
     height: 50,
     borderWidth: 1,
     borderColor: '#ddd',
     borderRadius: 8,
+    minHeight: 48,
   },
   featureButtonContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
   featureButton: {
-    padding: 10,
+    padding: 12,
+    height: 48,
     borderRadius: 20,
     borderWidth: 1,
     borderColor: '#ddd',
     margin: 5,
   },
   selectedFeatureButton: {
-    backgroundColor: '#008a43',
+    backgroundColor: '#006b3c',
   },
   featureText: {
     color: '#000',
@@ -447,6 +479,19 @@ const styles = StyleSheet.create({
   uploadedImages: {
     marginTop: 20,
   },
+  postAdButton: {
+    backgroundColor: '#006b3c', // Your preferred background color
+    paddingVertical: 15,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+
 });
 
 export default PostAdScreen;

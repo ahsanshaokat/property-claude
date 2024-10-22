@@ -56,7 +56,7 @@ const PropertyListing = ({ property, onPropertyClick }) => {
       const value = price / 100000;
       return value === 1 ? `${value} Lac` : `${value.toFixed(1)} Lacs`;
     }
-    return price.toLocaleString();
+    return price;
   };
 
   // Format timestamp to human-readable format using moment
@@ -91,15 +91,15 @@ const PropertyListing = ({ property, onPropertyClick }) => {
           <Text style={styles.propertyLocation} numberOfLines={1}>{property.address}</Text>
           <View style={styles.propertyDetails}>
             <View style={styles.propertyDetailItem}>
-              <Icon name="king-bed" size={16} color="#008a43" />
+              <Icon name="king-bed" size={16} color="#006b3c" />
               <Text style={styles.detailText}>{property.noOfBedRoom} Beds</Text>
             </View>
             <View style={styles.propertyDetailItem}>
-              <Icon name="bathtub" size={16} color="#008a43" />
+              <Icon name="bathtub" size={16} color="#006b3c" />
               <Text style={styles.detailText}>{property.noOfBathRoom} Baths</Text>
             </View>
             <View style={styles.propertyDetailItem}>
-              <Icon name="straighten" size={16} color="#008a43" />
+              <Icon name="straighten" size={16} color="#006b3c" />
               <Text style={styles.detailText}>{convertSize(property.propertySize)}</Text>
             </View>
           </View>
@@ -191,13 +191,13 @@ const styles = StyleSheet.create({
   },
   detailText: {
     fontSize: 12,
-    color: '#008a43',
+    color: '#006b3c',
     marginLeft: 4,
   },
   propertyPrice: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#008a43',
+    color: '#006b3c',
     marginTop: 5,
   },
   timestamp: {
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   contactButton: {
-    backgroundColor: '#008a43',
+    backgroundColor: '#006b3c',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,

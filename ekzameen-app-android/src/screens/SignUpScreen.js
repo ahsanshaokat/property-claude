@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Alert, TouchableOpacity, Picker } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import ModalSelector from 'react-native-modal-selector';
 import { login, signUp, saveAuthData } from '../data/api/authApi';
 
 // Validation schema using Yup
@@ -23,12 +22,6 @@ const SignUpScreen = ({ navigation }) => {
 
   const username = watch('username');
   const email = `${username}@tempmail.com`; // Hidden email, generated from username
-
-  // Data for ModalSelector
-  const signUpOptions = [
-    { key: 'user', label: 'User' },
-    { key: 'agent', label: 'Agent' },
-  ];
 
   // Function to handle sign-up form submission
   const onSubmit = async (data) => {
@@ -70,6 +63,7 @@ const SignUpScreen = ({ navigation }) => {
             placeholder="First Name"
             value={value}
             onChangeText={onChange}
+            accessibilityLabel="First Name Input"
           />
         )}
       />
@@ -84,6 +78,7 @@ const SignUpScreen = ({ navigation }) => {
             placeholder="Last Name"
             value={value}
             onChangeText={onChange}
+            accessibilityLabel="Last Name Input"
           />
         )}
       />
@@ -98,6 +93,7 @@ const SignUpScreen = ({ navigation }) => {
             placeholder="Username"
             value={value}
             onChangeText={onChange}
+            accessibilityLabel="Username Input"
           />
         )}
       />
@@ -113,21 +109,25 @@ const SignUpScreen = ({ navigation }) => {
             keyboardType="phone-pad"
             value={value}
             onChangeText={onChange}
+            accessibilityLabel="Phone Number Input"
           />
         )}
       />
       {errors.phone && <Text style={styles.errorText}>{errors.phone.message}</Text>}
 
-      {/* Sign Up As Picker */}
       <Text style={styles.label}>Sign Up As</Text>
-      <ModalSelector
-        data={signUpOptions}
-        initValue={signUpAs === 'user' ? 'User' : 'Agent'}
-        onChange={(option) => setSignUpAs(option.key)}
-        style={styles.modalPicker}
-        initValueTextStyle={styles.pickerText}
-        selectTextStyle={styles.pickerText}
-      />
+      <View style={styles.pickerContainer}>
+        <Picker
+          selectedValue={signUpAs}
+          style={styles.picker}
+          onValueChange={(itemValue) => setSignUpAs(itemValue)}
+          accessibilityLabel="Sign Up Role Selector"
+          accessibilityHint="Select your role as either User or Agent"
+        >
+          <Picker.Item label="User" value="user" />
+          <Picker.Item label="Agent" value="agent" />
+        </Picker>
+      </View>
 
       <Controller
         control={control}
@@ -139,13 +139,19 @@ const SignUpScreen = ({ navigation }) => {
             secureTextEntry
             value={value}
             onChangeText={onChange}
+            accessibilityLabel="Password Input"
           />
         )}
       />
       {errors.password && <Text style={styles.errorText}>{errors.password.message}</Text>}
 
-      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit(onSubmit)}>
-        <Text style={styles.submitButtonText}>Register</Text>
+      <TouchableOpacity 
+        style={styles.submitButton} 
+        onPress={handleSubmit(onSubmit)}
+        accessibilityLabel="Register Account Button"
+        accessibilityHint="Tap to create your new account"
+      >
+        <Text style={styles.submitButtonText}>Register Account</Text>
       </TouchableOpacity>
     </View>
   );
@@ -156,14 +162,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#f8f8f8',
+    backgroundColor: '#ffffff',
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
-    color: '#008a43',
+    color: '#006b3c', // Darker green for improved contrast
   },
   label: {
     fontSize: 16,
@@ -172,44 +178,49 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#8b8b8b', // Darker border for better contrast
     borderRadius: 8,
     padding: 10,
     marginBottom: 10,
     backgroundColor: '#fff',
     fontSize: 16,
     color: '#333',
+    minHeight: 48,
+    width: '100%',
   },
   inputError: {
-    borderColor: 'red',
+    borderColor: '#d32f2f', // High contrast red for errors
   },
   errorText: {
-    color: 'red',
+    color: '#d32f2f',
     marginBottom: 10,
   },
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: '#8b8b8b', // Ensuring contrast for the picker container
+    borderRadius: 8,
+    marginBottom: 10,
+    minHeight: 48,
+    justifyContent: 'center',
+    backgroundColor: '#fff',
+  },
+  picker: {
+    height: 48,
+    width: '100%',
+  },
   submitButton: {
-    backgroundColor: '#008a43',
+    backgroundColor: '#006b3c', // Darker green for better contrast
     paddingVertical: 12,
-    paddingHorizontal: 32,
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 20,
+    minHeight: 48,
+    width: '100%',
   },
   submitButtonText: {
-    color: '#fff',
+    color: '#ffffff',
     fontSize: 18,
     fontWeight: 'bold',
-  },
-  modalPicker: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 10,
-  },
-  pickerText: {
-    fontSize: 16,
-    color: '#333',
   },
 });
 

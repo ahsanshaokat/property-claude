@@ -38,7 +38,7 @@ const WebViewApp = () => {
             source={require('./assets/icon.png')} // Your splash image here
             style={styles.splashImage}
           />
-          <ActivityIndicator size="large" color="#008a43" style={styles.activityIndicator} />
+          <ActivityIndicator size="large" color="#006b3c" style={styles.activityIndicator} />
         </View>
       )}
       {error ? (
@@ -58,7 +58,7 @@ const WebViewApp = () => {
           onError={handleError} // Handle load errors
           startInLoadingState={true} // Shows an initial loading indicator
           renderLoading={() => (
-            <ActivityIndicator size="large" color="#008a43" style={styles.activityIndicator} />
+            <ActivityIndicator size="large" color="#006b3c" style={styles.activityIndicator} />
           )}
         />
       )}

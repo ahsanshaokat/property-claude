@@ -46,7 +46,7 @@ const PropertyCategory = ({ onCategoryClick }) => {
   );
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#008a43" />;
+    return <ActivityIndicator size="large" color="#006b3c" />;
   }
 
   return (
@@ -63,7 +63,7 @@ const PropertyCategory = ({ onCategoryClick }) => {
               <Icon
                 name={tab.icon}
                 size={20}
-                color={activeTab === tab.label ? '#008a43' : '#888'}
+                color={activeTab === tab.label ? '#006b3c' : '#888'}
               />
               <Text style={[styles.tabText, activeTab === tab.label && styles.activeTabText]}>
                 {tab.label}
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
   },
   activeTab: {
-    borderBottomColor: '#008a43',
+    borderBottomColor: '#006b3c',
   },
   tabText: {
     marginLeft: 5,
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   activeTabText: {
-    color: '#008a43',
+    color: '#006b3c',
     fontWeight: 'bold',
   },
   subTabsContainer: {

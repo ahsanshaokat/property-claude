@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image, ActivityIndicator, ScrollView, Alert, Linking } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';  // For icons
+import Icon from 'react-native-vector-icons/MaterialIcons'; // For icons
 import FontAwesome from 'react-native-vector-icons/FontAwesome'; // For WhatsApp icon
 import moment from 'moment';
 import { getPropertiesByFilter } from '../data/api/propertyApi';
@@ -80,12 +80,17 @@ const SearchResultsScreen = ({ route }) => {
   };
 
   const renderProperty = ({ item }) => (
-    <TouchableOpacity onPress={() => navigation.navigate('PropertyDetails', { propertyId: item.id })}>
+    <TouchableOpacity
+      onPress={() => navigation.navigate('PropertyDetails', { propertyId: item.id })}
+      accessibilityLabel={`View details of ${item.name}`}
+      accessibilityHint="Navigates to the property details screen"
+    >
       <View style={styles.propertyCard}>
         <View style={styles.imageContainer}>
           <Image
             source={{ uri: item.propertyImages.length > 0 ? item.propertyImages[0].image_url : 'https://via.placeholder.com/150' }}
             style={styles.propertyImage}
+            accessibilityLabel={`Image of ${item.name}`}
           />
           <View style={[styles.tag, item.purpose === 'SALE' ? styles.saleTag : styles.rentTag]}>
             <Text style={styles.tagText}>{item.purpose}</Text>
@@ -98,32 +103,47 @@ const SearchResultsScreen = ({ route }) => {
 
           <View style={styles.propertyDetails}>
             <View style={styles.propertyDetailItem}>
-              <Icon name="king-bed" size={16} color="#008a43" />
+              <Icon name="king-bed" size={16} color="#444" />
               <Text style={styles.detailText}>{item.noOfBedRoom} Beds</Text>
             </View>
             <View style={styles.propertyDetailItem}>
-              <Icon name="bathtub" size={16} color="#008a43" />
+              <Icon name="bathtub" size={16} color="#444" />
               <Text style={styles.detailText}>{item.noOfBathRoom} Baths</Text>
             </View>
             <View style={styles.propertyDetailItem}>
-              <Icon name="straighten" size={16} color="#008a43" />
+              <Icon name="straighten" size={16} color="#444" />
               <Text style={styles.detailText}>{item.propertySize} sq ft</Text>
             </View>
           </View>
 
-          <Text style={styles.propertyPrice}>PKR {item.price.toLocaleString()}</Text>
+          <Text style={styles.propertyPrice}>PKR {item.price}</Text>
           <Text style={styles.postedTime}>{moment(item.created_at).fromNow()}</Text>
 
           <View style={styles.actionButtons}>
-            <TouchableOpacity style={styles.button} onPress={() => handleWhatsApp(item.additionalSpec)}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => handleWhatsApp(item.additionalSpec)}
+              accessibilityLabel="Contact via WhatsApp"
+              accessibilityHint="Opens WhatsApp with a pre-filled message"
+            >
               <FontAwesome name="whatsapp" size={18} color="#fff" />
-              <Text style={styles.buttonText}>Whatsapp</Text>
+              <Text style={styles.buttonText}>WhatsApp</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={() => handleSMS(item.additionalSpec)}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => handleSMS(item.additionalSpec)}
+              accessibilityLabel="Send SMS"
+              accessibilityHint="Opens SMS app with the recipient's number"
+            >
               <Icon name="sms" size={18} color="#fff" />
               <Text style={styles.buttonText}>SMS</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={() => handleCall(item.additionalSpec)}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => handleCall(item.additionalSpec)}
+              accessibilityLabel="Make a call"
+              accessibilityHint="Opens the phone dialer with the recipient's number"
+            >
               <Icon name="phone" size={18} color="#fff" />
               <Text style={styles.buttonText}>Call</Text>
             </TouchableOpacity>
@@ -137,24 +157,24 @@ const SearchResultsScreen = ({ route }) => {
     <View style={styles.container}>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterContainer}>
         <TouchableOpacity style={styles.filterButton}>
-          <Icon name="filter-list" size={16} color="#008a43" />
+          <Icon name="filter-list" size={16} color="#006b3c" />
           <Text style={styles.filterText}>Filters</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.filterButton}>
-          <Icon name="sort" size={16} color="#008a43" />
+          <Icon name="sort" size={16} color="#006b3c" />
           <Text style={styles.filterText}>Sort</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.filterButton}>
-          <Icon name="location-on" size={16} color="#008a43" />
+          <Icon name="location-on" size={16} color="#006b3c" />
           <Text style={styles.filterText}>Location</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.filterButton}>
-          <Icon name="attach-money" size={16} color="#008a43" />
+          <Icon name="attach-money" size={16} color="#006b3c" />
           <Text style={styles.filterText}>Price Range</Text>
         </TouchableOpacity>
       </ScrollView>
       {loading ? (
-        <ActivityIndicator size="large" color="#008a43" />
+        <ActivityIndicator size="large" color="#006b3c" />
       ) : (
         <FlatList
           data={properties}
@@ -176,21 +196,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f2f2f2',
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    paddingVertical: 15,
-    paddingHorizontal: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginLeft: 10,
-  },
   filterContainer: {
     backgroundColor: '#fff',
     paddingVertical: 10,
@@ -207,17 +212,12 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 5,
     marginRight: 10,
-    height: 30,
+    height: 48,
   },
   filterText: {
     marginLeft: 5,
-    fontSize: 12,
-    color: '#008a43',
-  },
-  propertyList: {
-    marginTop: -10,
-    paddingBottom: 20,
-    background: 'transparent'
+    fontSize: 14,
+    color: '#006b3c',
   },
   propertyCard: {
     flexDirection: 'row',
@@ -245,10 +245,10 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   saleTag: {
-    backgroundColor: '#ffc107',
+    backgroundColor: '#ff5722',
   },
   rentTag: {
-    backgroundColor: '#ff5733',
+    backgroundColor: '#03a9f4',
   },
   tagText: {
     color: '#fff',
@@ -281,13 +281,13 @@ const styles = StyleSheet.create({
   },
   detailText: {
     fontSize: 12,
-    color: '#008a43',
+    color: '#444',
     marginLeft: 4,
   },
   propertyPrice: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#008a43',
+    color: '#006b3c',
     marginVertical: 5,
   },
   postedTime: {
@@ -300,9 +300,9 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   button: {
-    backgroundColor: '#008a43',
-    paddingVertical: 5,
-    paddingHorizontal: 10,
+    backgroundColor: '#006b3c',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
     borderRadius: 5,
     flexDirection: 'row',
     alignItems: 'center',
