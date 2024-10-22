@@ -5,6 +5,8 @@ import { getProperties, getCities } from '../data/api/propertyApi';
 import { useFocusEffect } from '@react-navigation/native';
 import PropertyCategory from '../components/home/PropertyCategory';
 import PropertyListing from '../components/home/PropertyListing';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const HomeScreen = ({ navigation }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -66,6 +68,25 @@ const HomeScreen = ({ navigation }) => {
       setCityDropdownOpen(false);
     }
   };
+
+  const handlePostAdPress = async () => {
+    try {
+      const accessToken = await AsyncStorage.getItem('accessToken');
+      const user = JSON.parse(await AsyncStorage.getItem('user'));
+  
+      if (accessToken || user) {
+        // If accessToken or user is present, navigate to Post Ad screen
+        navigation.navigate('PostAd');
+      } else {
+        // If no accessToken or user, navigate to Login screen
+        navigation.navigate('Login');
+      }
+    } catch (error) {
+      console.error('Error checking authentication:', error);
+      Alert.alert('Error', 'Something went wrong. Please try again.');
+    }
+  };
+  
 
   const loadMoreData = () => {
     if (!isFetchingMore) {
@@ -185,7 +206,7 @@ const HomeScreen = ({ navigation }) => {
         {/* Floating Add Post Button */}
         <TouchableOpacity
           style={styles.floatingButton}
-          onPress={() => navigation.navigate('PostAd')}
+          onPress={handlePostAdPress}
           accessibilityLabel="Post Ad Button"
           accessibilityHint="Tap to add a new property ad"
         >

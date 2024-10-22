@@ -17,18 +17,27 @@ const MyListingsScreen = () => {
   const navigation = useNavigation();
 
   useEffect(() => {
-    const fetchUserId = async () => {
+    const checkAuthentication = async () => {
       try {
+        const accessToken = await AsyncStorage.getItem('accessToken');
         const user = JSON.parse(await AsyncStorage.getItem('user'));
-        setUserId(user.id);
-        fetchProperties(true, user.id);
+  
+        if (!accessToken && !user) {
+          // If no accessToken or user object found, redirect to the login screen
+          navigation.navigate('Login');
+        } else if (user) {
+          setUserId(user.id);
+          fetchProperties(true, user.id);
+        }
       } catch (error) {
-        console.error('Error fetching user ID:', error);
+        console.error('Error checking authentication:', error);
+        Alert.alert('Error', 'Something went wrong. Please try again.');
       }
     };
-
-    fetchUserId();
-  }, []);
+  
+    checkAuthentication();
+  }, [navigation]);
+  
 
   const fetchProperties = async (resetPage = false, id) => {
     if (resetPage) {
