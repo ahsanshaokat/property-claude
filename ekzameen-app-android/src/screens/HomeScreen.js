@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, FlatList, StyleSheet, TextInput, Image, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TextInput, Image, TouchableOpacity, TouchableWithoutFeedback, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { getProperties, getCities } from '../data/api/propertyApi';
 import { useFocusEffect } from '@react-navigation/native';
@@ -43,6 +43,7 @@ const HomeScreen = ({ navigation }) => {
       }
     } catch (error) {
       console.error("Error fetching data: ", error);
+      Alert.alert('Error', 'Failed to fetch data. Please try again later.');
     } finally {
       setLoading(false);
       setIsFetchingMore(false);
@@ -68,7 +69,7 @@ const HomeScreen = ({ navigation }) => {
 
   const loadMoreData = () => {
     if (!isFetchingMore) {
-      setPage(prevPage => {
+      setPage((prevPage) => {
         const nextPage = prevPage + 1;
         fetchData();
         return nextPage;
@@ -78,7 +79,12 @@ const HomeScreen = ({ navigation }) => {
 
   const renderCityDropdown = () => (
     <View style={styles.cityDropdownContainer}>
-      <TouchableOpacity style={styles.locationButton} onPress={() => setCityDropdownOpen(!cityDropdownOpen)}>
+      <TouchableOpacity
+        style={styles.locationButton}
+        onPress={() => setCityDropdownOpen(!cityDropdownOpen)}
+        accessibilityLabel="City Selector"
+        accessibilityHint="Tap to open city selection menu"
+      >
         <Text style={styles.locationText}>{selectedCity.name}</Text>
         <Icon name="keyboard-arrow-down" size={20} color="#000" />
       </TouchableOpacity>
@@ -92,6 +98,8 @@ const HomeScreen = ({ navigation }) => {
                 setCityDropdownOpen(false);
               }}
               style={styles.cityOption}
+              accessibilityLabel={city.name}
+              accessibilityHint={`Select ${city.name} as your city`}
             >
               <Text>{city.name}</Text>
             </TouchableOpacity>
@@ -119,9 +127,16 @@ const HomeScreen = ({ navigation }) => {
                     style={styles.searchBar}
                     value={searchTerm}
                     onChangeText={setSearchTerm}
+                    accessibilityLabel="Property Search Input"
+                    accessibilityHint="Enter property details to search"
                   />
                   {renderCityDropdown()}
-                  <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
+                  <TouchableOpacity
+                    style={styles.searchButton}
+                    onPress={handleSearch}
+                    accessibilityLabel="Search Button"
+                    accessibilityHint="Tap to search properties"
+                  >
                     <Icon name="search" size={20} color="#000" />
                   </TouchableOpacity>
                 </View>
@@ -129,12 +144,16 @@ const HomeScreen = ({ navigation }) => {
                   <TouchableOpacity
                     style={[styles.toggleButton, selectedOption === 'Buy' && styles.activeButton]}
                     onPress={() => setSelectedOption('Buy')}
+                    accessibilityLabel="Buy Option"
+                    accessibilityHint="Tap to search for properties to buy"
                   >
                     <Text style={[styles.toggleText, selectedOption === 'Buy' && styles.activeToggleText]}>Buy</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={[styles.toggleButton, selectedOption === 'Rent' && styles.activeButton]}
                     onPress={() => setSelectedOption('Rent')}
+                    accessibilityLabel="Rent Option"
+                    accessibilityHint="Tap to search for properties to rent"
                   >
                     <Text style={[styles.toggleText, selectedOption === 'Rent' && styles.activeToggleText]}>Rent</Text>
                   </TouchableOpacity>
@@ -167,6 +186,8 @@ const HomeScreen = ({ navigation }) => {
         <TouchableOpacity
           style={styles.floatingButton}
           onPress={() => navigation.navigate('PostAd')}
+          accessibilityLabel="Post Ad Button"
+          accessibilityHint="Tap to add a new property ad"
         >
           <Icon name="add" size={30} color="#fff" />
         </TouchableOpacity>
@@ -200,7 +221,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 100,
-    opacity: 1.3,
+    opacity: 1,
   },
   toggleContainer: {
     flexDirection: 'row',
@@ -217,12 +238,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 20,
+    minHeight: 48,
   },
   activeButton: {
     backgroundColor: '#006b3c',
   },
   toggleText: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#333',
   },
   activeToggleText: {
@@ -235,7 +257,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 30,
     paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingVertical: 4,
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 5,
@@ -244,7 +266,7 @@ const styles = StyleSheet.create({
   },
   searchBar: {
     flex: 1,
-    paddingVertical: 8,
+    paddingVertical: 13.5,
     fontSize: 16,
   },
   searchButton: {

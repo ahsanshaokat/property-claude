@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import { getPropertyTypes } from '../../data/api/propertyApi';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -24,6 +24,7 @@ const PropertyCategory = ({ onCategoryClick }) => {
       }
     } catch (error) {
       console.error('Error fetching property types:', error);
+      Alert.alert('Error', 'Failed to load property types. Please try again later.');
     } finally {
       setLoading(false);
     }
@@ -39,6 +40,8 @@ const PropertyCategory = ({ onCategoryClick }) => {
     <TouchableOpacity
       onPress={() => onCategoryClick(item.alias)}
       style={styles.subCategoryItem}
+      accessibilityLabel={`${item.name} category`}
+      accessibilityHint={`Tap to view properties under ${item.name}`}
     >
       <Text style={styles.subCategoryText}>{item.name}</Text>
       <Text style={styles.propertyCount}>({item.propertyCount || 0})</Text>
@@ -59,6 +62,9 @@ const PropertyCategory = ({ onCategoryClick }) => {
               key={tab.label}
               style={[styles.tab, activeTab === tab.label && styles.activeTab]}
               onPress={() => setActiveTab(tab.label)}
+              accessibilityLabel={`${tab.label} tab`}
+              accessibilityHint={`Tap to view ${tab.label} properties`}
+              activeOpacity={0.8}
             >
               <Icon
                 name={tab.icon}
@@ -71,12 +77,6 @@ const PropertyCategory = ({ onCategoryClick }) => {
             </TouchableOpacity>
           ))}
         </View>
-        {/* <View style={styles.subTabsContainer}>
-          <Text style={styles.subTab}>Popular</Text>
-          <Text style={styles.subTab}>Type</Text>
-          <Text style={styles.subTab}>Location</Text>
-          <Text style={styles.subTab}>Area Size</Text>
-        </View> */}
         <View style={styles.categoryGrid}>
           <FlatList
             data={propertyTypes}
@@ -129,9 +129,12 @@ const styles = StyleSheet.create({
   tab: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 5,
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 15,
     borderBottomWidth: 2,
     borderBottomColor: 'transparent',
+    minHeight: 48, // Ensuring minimum touch area
   },
   activeTab: {
     borderBottomColor: '#006b3c',
@@ -145,15 +148,6 @@ const styles = StyleSheet.create({
     color: '#006b3c',
     fontWeight: 'bold',
   },
-  subTabsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 20,
-  },
-  subTab: {
-    color: '#888',
-    fontSize: 14,
-  },
   categoryGrid: {
     paddingHorizontal: 1,
   },
@@ -166,11 +160,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flex: 1,
     borderRadius: 10,
-    padding: 5,
+    padding: 10,
     backgroundColor: '#fff',
     marginBottom: 15,
     borderColor: '#ddd',
     borderWidth: 1,
+    minHeight: 48,
+    accessibilityRole: 'button',
   },
   subCategoryText: {
     fontSize: 14,

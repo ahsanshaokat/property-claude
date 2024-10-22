@@ -77,7 +77,7 @@ const PropertyListing = ({ property, onPropertyClick }) => {
   };
 
   return (
-    <TouchableOpacity onPress={() => onPropertyClick(property.id)}>
+    <TouchableOpacity onPress={() => onPropertyClick(property.id)} accessibilityLabel={`View details for ${property.name}`}>
       <View style={styles.propertyCard}>
         <View style={[styles.propertyTag, property.purpose === 'SALE' ? styles.saleTag : styles.rentTag]}>
           <Text style={styles.tagText}>{property.purpose}</Text>
@@ -85,6 +85,7 @@ const PropertyListing = ({ property, onPropertyClick }) => {
         <Image 
           source={{ uri: property.propertyImages.length > 0 ? property.propertyImages[0].image_url : 'https://via.placeholder.com/150' }}
           style={styles.propertyImage}
+          accessibilityLabel={`${property.name} image`}
         />
         <View style={styles.propertyInfo}>
           <Text style={styles.propertyTitle} numberOfLines={2}>{property.name}</Text>
@@ -106,15 +107,15 @@ const PropertyListing = ({ property, onPropertyClick }) => {
           <Text style={styles.propertyPrice}>Rs. {formatPrice(property.price)}</Text>
           <Text style={styles.timestamp}>{formatTimestamp(property.updated_at)}</Text>
           <View style={styles.contactButtons}>
-            <TouchableOpacity style={styles.contactButton} onPress={() => handleWhatsApp(property.additionalSpec)}>
+            <TouchableOpacity style={styles.contactButton} onPress={() => handleWhatsApp(property.additionalSpec)} accessibilityLabel="Contact via WhatsApp">
               <FontAwesome name="whatsapp" size={18} color="#fff" />
               <Text style={styles.contactButtonText}></Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.contactButton} onPress={() => handleSMS(property.additionalSpec)}>
+            <TouchableOpacity style={styles.contactButton} onPress={() => handleSMS(property.additionalSpec)} accessibilityLabel="Send SMS">
               <Icon name="sms" size={18} color="#fff" />
               <Text style={styles.contactButtonText}>SMS</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.contactButton} onPress={() => handleCall(property.additionalSpec)}>
+            <TouchableOpacity style={styles.contactButton} onPress={() => handleCall(property.additionalSpec)} accessibilityLabel="Call property owner">
               <Icon name="phone" size={18} color="#fff" />
               <Text style={styles.contactButtonText}>Call</Text>
             </TouchableOpacity>
@@ -138,6 +139,7 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 6,
+    accessibilityRole: 'button',
   },
   propertyTag: {
     position: 'absolute',
