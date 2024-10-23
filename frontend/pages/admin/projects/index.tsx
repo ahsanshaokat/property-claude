@@ -1,5 +1,6 @@
 import AdminProjectList from "@/components/admin/projects/AdminProjectList";
 import Loader from "@/components/common/loader/Loader";
+import { useRouter } from "next/router";
 import BasicPagination from "@/components/common/pagination/BasicPagination";
 import { HandlePaginationProps } from "@/components/common/pagination/pagination-types";
 import AdminLayout from "@/components/layouts/AdminLayout";
@@ -16,6 +17,7 @@ type AdminProjectsProps = {
 };
 
 const Index: NextPageWithLayout<AdminProjectsProps> = ({ projects }) => {
+  const router = useRouter();
   const [projectList, setProjectList] = useState<ProjectList | null>(projects); // Set default to null if projects is not provided
   const [active, setActive] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -48,6 +50,14 @@ const Index: NextPageWithLayout<AdminProjectsProps> = ({ projects }) => {
     <Container className="py-1">
       <Row className="py-2">
         <Col>
+        
+        <Button
+          variant="warning"
+          onClick={() => router.push("/admin/projects/create")}
+          className="rounded-0 ft-13 fw-normal mb-3"
+        >
+          Create New Project
+        </Button>
           {loading && <Loader />}
           {/* Check if projectList and projectList.data are available */}
           {!loading && projectList && projectList.length > 0 ? (

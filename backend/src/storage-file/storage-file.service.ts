@@ -40,6 +40,7 @@ export class StorageFileService {
       );
 
       // Create the StorageFile entity and set fileName programmatically
+      console.log("==createDto=", createDto)
       const storageFile = this.storageFileRepository.create({
         ...createDto,
         fileName: file.filename, // Automatically set this after Multer or Cloudinary handles it

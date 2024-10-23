@@ -1773,7 +1773,7 @@ property-expr@^2.0.4:
     lodash "^4.17.21"
     next "12.3.0"
     next-auth "^4.13.0"
-    property-finder-fe "file:C:/Users/Ahsan.Shaokat/AppData/Local/Yarn/Cache/v6/npm-property-finder-fe-0.1.0-d217b348-0b33-4c63-9a8d-5c942d8b61de-1729625304139/node_modules/property-finder-fe"
+    property-finder-fe "file:C:/Users/Ahsan.Shaokat/AppData/Local/Yarn/Cache/v6/npm-property-finder-fe-0.1.0-21b2de30-69b8-4f2f-8be5-101a70191ea8-1729690430988/node_modules/property-finder-fe"
     qs "^6.11.0"
     react "18.2.0"
     react-bootstrap "^2.5.0"

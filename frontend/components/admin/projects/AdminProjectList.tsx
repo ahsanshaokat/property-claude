@@ -14,13 +14,6 @@ const AdminProjectList: React.FC<Projects> = ({ data }) => {
     <Row className="py-4 px-2">
       <Col>
         {/* Create New Project Button */}
-        <Button
-          variant="warning"
-          onClick={() => router.push("/admin/projects/create")}
-          className="rounded-0 ft-13 fw-normal mb-3"
-        >
-          Create New Project
-        </Button>
 
         <Table className="border" responsive>
           <thead>

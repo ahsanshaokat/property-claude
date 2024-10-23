@@ -21,6 +21,9 @@ export class StorageFile extends BaseEntity {
   public_id: string;
 
   @Column({ nullable: true })
+  project_id: number;
+
+  @Column({ nullable: true })
   image_url: string;
 
   @ManyToOne(() => Property, (property) => property.propertyImages, {

@@ -10,4 +10,7 @@ export class CreateStorageFileDto {
 
   @IsOptional()
   fileName: string;
+
+  @IsOptional()
+  project_id: number;
 }

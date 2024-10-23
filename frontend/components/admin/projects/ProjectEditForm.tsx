@@ -129,6 +129,7 @@ const ProjectEditForm: React.FC<ProjectEditProps> = ({
     formData.append("file", files[0]); // Add the file itself
     formData.append("type", imageType); // Add the image type
     formData.append("fileName", files[0].name); // Add the file name
+    formData.append("project_id", project.id); // Add the file name
 
     setLoading(true);
 
