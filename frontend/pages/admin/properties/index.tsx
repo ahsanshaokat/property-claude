@@ -21,6 +21,8 @@ import { unstable_getServerSession } from "next-auth";
 import React, { ReactElement, useCallback, useEffect, useState } from "react";
 import { Row, Col, Card, Container } from "react-bootstrap";
 import { MdCategory, MdLocationCity, MdOutlineHomeWork } from "react-icons/md";
+import SubmitButton from "@/components/common/form/SubmitButton";
+import router from "next/router";
 
 type AdminHomeProps = {
   adminHome: {
@@ -95,6 +97,17 @@ const Index: NextPageWithLayout<AdminHomeProps> = ({
   return (
     <Container className="py-5">
       <Row>
+      <SubmitButton
+              title="Add Property"
+              variant="warning"
+              loadingTitle="Redirecting"
+              onClick={() => {
+                setLoading(true);
+                router.push("/admin/properties/create");
+              }}
+              isLoading={loading}
+              buttonCls="rounded-0 ft-13 fw-normal"
+            />
         <Col md="4">
           <Card>
             <Card.Body>
